@@ -1,0 +1,17 @@
+{
+  "name": "data-vis-project-harsh-aman-anirudh-soumya-ashutosh",
+  "version": "1.0.0",
+  "description": "DV Group Project for Fall 24",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npx nodemon server.js"
+  },
+  "author": "harsh-chandak",
+  "license": "ISC",
+  "dependencies": {
+    "csvtojson": "^2.0.10",
+    "express": "^4.21.1",
+    "json2csv": "^6.0.0-alpha.2"
+  }
+}
