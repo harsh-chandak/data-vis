@@ -1,125 +1,272 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const svgWidth = 800, svgHeight = 600;
+    const svgWidth = 1200, svgHeight = 600;
     const svg = d3.select("#splom-svg")
         .attr("width", svgWidth)
         .attr("height", svgHeight);
 
-    d3.csv("final.csv").then(rawData => {
-        // Step 1: Define a mapping of variations to standard brand names
-        const brandMappings = {
-            "CHEVROLET": ["CHEVY", "CHEV", "CHEVORLET"],
-            "MERCEDES-BENZ": ["MERCEDES", "MERCEDES BENZ", "MERCEDEZ", "MERZ", "MERC"],
-            "TOYOTA": ["TOY", "TOYO", "TOYT", "TOYTA"],
-            "NISSAN": ["NISS"],
-            "HONDA": ["HOND"],
-            "HYUNDAI": ["HYUND", "HYUNDIA", "HYUN"],
-            "VOLKSWAGEN": ["VW", "VOLK", "VOLKS", "VOLKSWAGON"],
-            "LEXUS": ["LEXS", "LEXU"],
-            "SUBARU": ["SUBA"],
-            "INFINITI": ["INFI", "INFINITY"],
-            "ACURA": ["ACUR"],
-            "BUICK": ["BUIC"],
-            "MAZDA": ["MAZD"],
-            "DODGE": ["DODG"],
-            "LAND ROVER": ["LANDROVER"],
-            "THOMAS BUILT": ["THMS", "THOM", "THOMAS"],
-            "GILLIG": ["GILL", "GILG"],
-            "FREIGHTLINER": ["FRHT"],
-            "CADILLAC": ["CADI"],
-            "PONTIAC": ["PONT"],
-            "VOLVO": ["VOLV"],
-            "TESLA": ["TESL"],
-            "PORSCHE": ["PORS"],
-            "UNKNOWN": ["UNK"],
-            "HARLEY DAVIDSON": ["SPAR"],
-            "MITSUBISHI": ["MITS"],
-            "LINCOLN": ["LINC"]
-            // Add more mappings as needed
+    d3.csv("final.csv", (row) => ({
+        injury_severity: row.injury_severity,
+        vehicle_year: row.vehicle_year,
+        vehicle_make: row.vehicle_make
+    })).then(rawData => {
+        let makeCount = {};
+
+        rawData.forEach(row => {
+            let make = row.vehicle_make;
+            makeCount[make] = (makeCount[make] || 0) + 1; // Increment count for each vehicle_make
+        });
+
+        // Step 2: Filter makes that have a count greater than 20
+        let filteredMakes = Object.keys(makeCount).filter(make => makeCount[make] > 10);
+
+        // Step 3: Output the filtered makes
+        console.log(filteredMakes);
+        const data = processData(rawData);
+        createPieChartMatrix(data);
+    });
+
+    function processData(rawData) {
+        const car_country = {
+            "SUBARU": "Japanese",
+            "AUDI": "German",
+            "HONDA": "Japanese",
+            "FORD": "American",
+            "GILLIG": "American",
+            "TOYOTA": "Japanese",
+            "NISSAN": "Japanese",
+            "ACURA": "Japanese",
+            "JEEP": "American",
+            "BUICK": "American",
+            "KIA": "Korean",
+            "LAND ROVER": "European", // British
+            "MAZDA": "Japanese",
+            "DODGE": "American",
+            "BMW": "German",
+            "CHEVROLET": "American",
+            "HYUNDAI": "Korean",
+            "RAM": "American",
+            "VOLKSWAGEN": "German",
+            "LEXUS": "Japanese",
+            "MACK": "American",
+            "MITSUBISHI": "Japanese",
+            "MERCEDES-BENZ": "German",
+            "TESLA": "American",
+            "VOLVO": "European", // Swedish
+            "FREIGHTLINER": "American",
+            "LINCOLN": "American",
+            "INTERNATIONAL": "American",
+            "THOMAS BUILT": "American",
+            "NEW FLYER": "American",
+            "NABI": "American",
+            "FIAT": "European",
+            "MINI": "European", // British
+            "other": "other",
+            "CADILLAC": "American",
+            "CHRYSLER": "American",
+            "GMC": "American",
+            "INFINITI": "Japanese",
+            "JAGUAR": "European", // British
+            "MERCURY": "American",
+            "SUZUKI": "Japanese",
+            "HARLEY DAVIDSON": "American",
+            "HINO": "Japanese",
+            "SATURN": "American",
+            "PETERBILT": "American",
+            "ISUZU": "Japanese",
+            "KENWORTH": "American",
+            "KAWASAKI": "Japanese",
+            "SAAB": "European", // Swedish
+            "NISS": "Japanese",
+            "HOND": "Japanese",
+            "FRHT": "American",
+            "CHEV": "American",
+            "GILG": "American",
+            "INFI": "Japanese",
+            "TOYT": "Japanese",
+            "CHEVY": "American",
+            "MERC": "German",
+            "PONTIAC": "American",
+            "NWFL": "American",
+            "MERCEDES": "German",
+            "HYUN": "Korean",
+            "THOMAS": "American",
+            "TOYTA": "Japanese",
+            "MITS": "Japanese",
+            "LEXS": "Japanese",
+            "SUBA": "Japanese",
+            "MERZ": "German",
+            "TBU": "American",
+            "VOLKS": "German",
+            "CADI": "American",
+            "NFLY": "American",
+            "INTL": "American",
+            "VOLK": "German",
+            "VOLKSWAGON": "German",
+            "DODG": "American",
+            "THMS": "American",
+            "THOM": "American",
+            "CHRY": "American",
+            "LANDROVER": "European", // British
+            "CHEVORLET": "American",
+            "TESL": "American",
+            "SCION": "Japanese",
+            "LINC": "American",
+            "ACUR": "Japanese",
+            "MAZD": "Japanese",
+            "YAMAHA": "Japanese",
+            "BUIC": "American",
+            "INFINITY": "Japanese",
+            "GILL": "American",
+            "PORS": "German",
+            "NISSIAN": "Japanese",
+            "TOYO": "Japanese",
+            "ISU": "Japanese",
+            "VW": "German",
+            "PORSCHE": "German",
+            "SPAR": "American",
+            "UU": "other",
+            "MERCEDEZ": "German",
+            "UNK": "other",
+            "LEXU": "Japanese",
+            "PIERCE": "American",
+            "TOYOT": "Japanese",
+            "MERCEDES BENZ": "German",
+            "HYUND": "Korean",
+            "VOLV": "European", // Swedish
+            "HYUNDIA": "Korean",
+            "CHEVEROLET": "American",
+            "TOY": "Japanese",
+            "SUZI": "Japanese",
+            "FREIGHT": "American",
+            "SPARTAN": "American",
+            "PTRB": "American",
+            "PONT": "American",
+            "PETERBUILT": "American",
+            "STERLING": "American",
+            "ORIO": "other",
+            "ORION": "other"
         };
 
-        // Reverse the mapping for easier lookup
-        const reverseMapping = Object.entries(brandMappings).reduce((acc, [key, values]) => {
-            values.forEach(value => acc[value.toUpperCase()] = key);
-            acc[key.toUpperCase()] = key; // Include the standard name as well
-            return acc;
-        }, {});
 
-        // Step 2: Normalize car brands in the data
-        const normalizedData = rawData.map(record => {
-            const originalBrand = record["vehicle_make"]?.toUpperCase() || "UNKNOWN";
-            record["vehicle_make"] = reverseMapping[originalBrand] || originalBrand; // Map or keep original
-            return record;
+
+        const years = {
+            '1900': 'Before 2000', '1901': 'Before 2000', '1966': 'Before 2000', '1969': 'Before 2000', '1971': 'Before 2000', '1974': 'Before 2000', '1977': 'Before 2000',
+            '1978': 'Before 2000', '1980': 'Before 2000', '1981': 'Before 2000', '1982': 'Before 2000', '1983': 'Before 2000', '1985': 'Before 2000', '1986': 'Before 2000',
+            '1987': 'Before 2000', '1988': 'Before 2000', '1989': 'Before 2000', '1990': 'Before 2000', '1991': 'Before 2000', '1992': 'Before 2000', '1993': 'Before 2000',
+            '1994': 'Before 2000', '1995': 'Before 2000', '1996': 'Before 2000', '1997': 'Before 2000', '1998': 'Before 2000', '1999': 'Before 2000', '2000': 'Before 2000',
+            '2001': '2000-2015', '2002': '2000-2015', '2003': '2000-2015', '2004': '2000-2015', '2005': '2000-2015', '2006': '2000-2015', '2007': '2000-2015', '2008': '2000-2015',
+            '2009': '2000-2015', '2010': '2000-2015', '2011': '2000-2015', '2012': '2000-2015', '2013': '2000-2015', '2014': '2000-2015', '2015': '2000-2015',
+            '2016': 'After 2015', '2017': 'After 2015', '2018': 'After 2015', '2019': 'After 2015', '2020': 'After 2015', '2021': 'After 2015', '2022': 'After 2015', '2023': 'After 2015',
+            '2024': 'After 2015', "1": "other"
+        }
+
+        let final_data = [];
+        rawData.map(row => {
+            if (car_country[String(row.vehicle_make).trim().toUpperCase()]) {
+                const country = car_country[String(row.vehicle_make).trim().toUpperCase()] || 'other';
+                const year_group = years[row.vehicle_year] || 'other';
+                const injury = String(row.injury_severity).trim().toUpperCase()
+                const injury_severity = injury.toUpperCase().includes("NO APPARENT INJURY") ? "None" :
+                    injury.toUpperCase().includes("SUSPECTED MINOR INJURY") ? "Minor" :
+                        (injury.toUpperCase().includes("POSSIBLE INJURY") || injury.toUpperCase().includes("SUSPECTED SERIOUS INJURY")) ? "Moderate" :
+                            injury.toUpperCase().includes("FATAL INJURY") ? "Serious" :
+                                "other";
+                final_data.push({ injury_severity: injury_severity, car_country: country, make_year: year_group });
+            }
         });
 
-        // Group and process as needed
-        const groupedData = d3.group(normalizedData, d => d["vehicle_make"]);
+        let country_group = [...new Set(Object.values(car_country))];
+        let year_group = [...new Set(Object.values(years))];
 
-        // Process each group to calculate required values
-        const processedData = Array.from(groupedData, ([brand, records]) => {
-            const totalAccidents = records.length;
-            if (totalAccidents <= 15) return null; // Exclude small groups
+        return { final_data, year_group, country_group };
+    }
 
-            const faultCount = records.filter(r => r["driver_at_fault"] === "Yes").length;
-            const noFaultCount = totalAccidents - faultCount;
+    function createPieChartMatrix(data) {
+        const pieWidth = 80, pieHeight = 80;
+        const margin = { top: 20, right: 20, bottom: 20, left: 120 }; // Increased left margin to shift graph to the right
 
-            return {
-                brand: brand,
-                accidents: totalAccidents,
-                fault: faultCount,
-                noFault: noFaultCount
-            };
-        }).filter(d => d !== null);
+        const { final_data, year_group, country_group } = data;
 
-        console.log(processedData)
+        // Set up the scales for positioning
+        const xScale = d3.scaleBand()
+            .domain(year_group)
+            .range([margin.left, svgWidth - margin.right])
+            .padding(0.1);
 
-        // Step 3: Create a hierarchical layout for bubbles
-        const pack = d3.pack()
-            .size([svgWidth, svgHeight])
-            .padding(5);
+        const yScale = d3.scaleBand()
+            .domain(country_group)
+            .range([margin.top, svgHeight - margin.bottom])
+            .padding(0.1);
 
-        const root = d3.hierarchy({ children: processedData })
-            .sum(d => d.accidents);
+        // Create axes
+        const xAxis = d3.axisBottom(xScale).tickSize(0);
+        const yAxis = d3.axisLeft(yScale).tickSize(0);
 
-        const nodes = pack(root).leaves();
+        // Append the x and y axes
+        svg.append("g")
+            .attr("transform", `translate(0,${svgHeight - margin.bottom})`)
+            .call(xAxis)
+            .selectAll("text")
+            .attr("fill", "white")  // Set x axis font color to white
+            .style("font-size", "20px");  // Increase font size for x axis
 
-        // Draw bubbles
-        const bubbles = svg.selectAll("g")
-            .data(nodes)
-            .enter().append("g")
-            .attr("transform", d => `translate(${d.x}, ${d.y})`);
+        svg.append("g")
+            .attr("transform", `translate(${margin.left},0)`)
+            .call(yAxis)
+            .selectAll("text")
+            .attr("fill", "white")  // Set y axis font color to white
+            .style("font-size", "20px");  // Increase font size for y axis
+        // Set y axis font color to white
 
-        // Outer circle for bubble
-        bubbles.append("circle")
-            .attr("r", d => d.r)
-            .attr("fill", "lightblue")
-            .attr("stroke", "steelblue");
+        // Create a pie chart for each year_group and car_country combination
+        year_group.forEach((year, i) => {
+            country_group.forEach((country, j) => {
+                const groupData = final_data.filter(d => d.make_year === year && d.car_country === country);
 
-        // Embedded pie charts
-        bubbles.each(function (d) {
-            const arcGen = d3.arc()
-                .innerRadius(0)
-                .outerRadius(d.r);
+                // Count the frequency of each injury_severity for the current group
+                const injurySeverityCount = d3.rollup(groupData, v => v.length, d => d.injury_severity);
+                console.log("HI there data" + injurySeverityCount)
 
-            const pieGen = d3.pie()
-                .value(d => d.value);
+                const pieData = Array.from(injurySeverityCount, ([injury, count]) => ({ injury, count }));
 
-            const pieData = pieGen([
-                { value: d.data.fault, label: "At Fault" },
-                { value: d.data.noFault, label: "Not at Fault" }
-            ]);
+                // Create a pie chart layout
+                const pie = d3.pie().value(d => d.count)(pieData);
+                const arc = d3.arc().innerRadius(0).outerRadius(pieWidth / 2);
 
-            d3.select(this).selectAll("path")
-                .data(pieData)
-                .enter().append("path")
-                .attr("d", arcGen)
-                .attr("fill", (d, i) => i === 0 ? "red" : "green");
+                // Append pie chart SVG groups (shifted to align with x axis)
+                const pieGroup = svg.append("g")
+                    .attr("transform", `translate(${xScale(year) + xScale.bandwidth() / 2}, ${yScale(country) + yScale.bandwidth() / 2})`); // Align pie with center of grid cell
+
+                // Draw pie chart slices
+                pieGroup.selectAll("path")
+                    .data(pie)
+                    .enter().append("path")
+                    .attr("d", arc)
+                    .attr("fill", (d, i) => d3.schemeCategory10[i % 10])  // Color the slices
+                    .attr("stroke", "white")
+                    .attr("stroke-width", 1);
+            });
         });
 
-        // Add labels
-        bubbles.append("text")
-            .attr("dy", ".3em")
-            .style("text-anchor", "middle")
-            .style("font-size", "10px")
-            .text(d => d.data.brand);
-    });
+        // Draw legend
+        const legendData = [...new Set(final_data.map(d => d.injury_severity))];
+        const legend = svg.append("g")
+            .attr("transform", `translate(${svgWidth - margin.right - 20}, ${margin.top})`); // Shift the legend towards the right
+
+        legendData.forEach((severity, i) => {
+            legend.append("rect")
+                .attr("x", 0)
+                .attr("y", i * 20)
+                .attr("width", 15)
+                .attr("height", 15)
+                .attr("fill", d3.schemeCategory10[i % 10]);
+
+            legend.append("text")
+                .attr("x", 20)
+                .attr("y", i * 20 + 12)
+                .attr("fill", "white")
+                .text(severity);
+        });
+    }
+
 });
