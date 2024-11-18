@@ -15,7 +15,7 @@ body {
     background-color: black;
     position: relative;
     width: 80%;
-    height: 800px;
+    height: 1000px;
     margin-bottom: 50px;
 }
 
@@ -45,12 +45,6 @@ svg {
 }
 
 #splom-svg{
-    /*
-        Add styles for your svg
-    */    
-}
-
-#stacked-bar-chart-svg{
     /*
         Add styles for your svg
     */    
