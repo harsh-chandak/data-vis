@@ -183,11 +183,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function createPieChartMatrix(data) {
         const pieWidth = 80, pieHeight = 80;
-        const margin = { top: 20, right: 20, bottom: 20, left: 120 }; // Increased left margin to shift graph to the right
+        const margin = { top: 20, right: 20, bottom: 20, left: 120 };
 
         const { final_data, year_group, country_group } = data;
 
-        // Set up the scales for positioning
+        const colorMapping = {
+            "None": "#9467bd",
+            "Minor": "#1f77b4",  // Blue
+            "Moderate": "#ff7f0e",  // Orange
+            "Serious": "#2ca02c"  // Green
+            
+        };
+        
+
+        // Scales for positioning
         const xScale = d3.scaleBand()
             .domain(year_group)
             .range([margin.left, svgWidth - margin.right])
@@ -198,60 +207,142 @@ document.addEventListener('DOMContentLoaded', function () {
             .range([margin.top, svgHeight - margin.bottom])
             .padding(0.1);
 
-        // Create axes
+        // Axes
         const xAxis = d3.axisBottom(xScale).tickSize(0);
         const yAxis = d3.axisLeft(yScale).tickSize(0);
 
-        // Append the x and y axes
+        // Append axes
         svg.append("g")
             .attr("transform", `translate(0,${svgHeight - margin.bottom})`)
             .call(xAxis)
             .selectAll("text")
-            .attr("fill", "white")  // Set x axis font color to white
-            .style("font-size", "20px");  // Increase font size for x axis
+            .attr("fill", "white")
+            .style("font-size", "20px");
 
         svg.append("g")
             .attr("transform", `translate(${margin.left},0)`)
             .call(yAxis)
             .selectAll("text")
-            .attr("fill", "white")  // Set y axis font color to white
-            .style("font-size", "20px");  // Increase font size for y axis
-        // Set y axis font color to white
+            .attr("fill", "white")
+            .style("font-size", "20px");
 
-        // Create a pie chart for each year_group and car_country combination
-        year_group.forEach((year, i) => {
-            country_group.forEach((country, j) => {
+        // Create an overlay for the enlarged chart
+        const overlay = d3.select("body").append("div")
+            .attr("id", "overlay")
+            .style("position", "absolute")
+            .style("display", "none")
+            .style("background", "rgba(0, 0, 0, 0.8)")
+            .style("border-radius", "10px")
+            .style("padding", "20px")
+            .style("width", "400px")  // Set the width of the overlay
+            .style("height", "400px") // Set the height of the overlay
+            .style("z-index", 10);
+
+
+        overlay.append("svg")
+            .attr("width", 320)
+            .attr("height", 320)
+            .attr("id", "overlay-pie");
+
+        // Create pie charts
+        year_group.forEach(year => {
+            country_group.forEach(country => {
                 const groupData = final_data.filter(d => d.make_year === year && d.car_country === country);
 
-                // Count the frequency of each injury_severity for the current group
                 const injurySeverityCount = d3.rollup(groupData, v => v.length, d => d.injury_severity);
-                console.log("HI there data" + injurySeverityCount)
-
                 const pieData = Array.from(injurySeverityCount, ([injury, count]) => ({ injury, count }));
 
-                // Create a pie chart layout
                 const pie = d3.pie().value(d => d.count)(pieData);
                 const arc = d3.arc().innerRadius(0).outerRadius(pieWidth / 2);
 
-                // Append pie chart SVG groups (shifted to align with x axis)
                 const pieGroup = svg.append("g")
-                    .attr("transform", `translate(${xScale(year) + xScale.bandwidth() / 2}, ${yScale(country) + yScale.bandwidth() / 2})`); // Align pie with center of grid cell
+                    .attr("transform", `translate(${xScale(year) + xScale.bandwidth() / 2}, ${yScale(country) + yScale.bandwidth() / 2})`);
 
-                // Draw pie chart slices
-                pieGroup.selectAll("path")
+                // Draw pie slices
+                const paths = pieGroup.selectAll("path")
                     .data(pie)
                     .enter().append("path")
                     .attr("d", arc)
-                    .attr("fill", (d, i) => d3.schemeCategory10[i % 10])  // Color the slices
+                    .attr("fill", (d, i) => d3.schemeCategory10[i % 10])
                     .attr("stroke", "white")
                     .attr("stroke-width", 1);
+
+                
+                paths.on("mouseover", function (event, d) {
+                    d3.select(this)
+                        .attr("stroke", "yellow")
+                        .attr("stroke-width", 3);
+
+                    
+                    const overlayPie = d3.select("#overlay-pie");
+
+                    
+                    overlayPie.selectAll("path").remove();
+                    overlayPie.selectAll("text").remove();
+
+                    
+                    const overlayWidth = +overlayPie.attr("width");
+                    const overlayHeight = +overlayPie.attr("height");
+                    const centerX = overlayWidth / 2;
+                    const centerY = overlayHeight / 2;
+
+                    
+                    const enlargedArc = d3.arc()
+                        .innerRadius(0)
+                        .outerRadius(Math.min(overlayWidth, overlayHeight) / 2 - 20); 
+
+                    
+                    const total = pie.reduce((sum, p) => sum + p.data.count, 0);
+
+                
+                    overlayPie.selectAll("path")
+                        .data(pie)
+                        .enter().append("path")
+                        .attr("d", enlargedArc)
+                        .attr("fill", (d, i) => d3.schemeCategory10[i % 10])
+                        .attr("stroke", "white")
+                        .attr("stroke-width", 2)
+                        .attr("transform", `translate(${centerX}, ${centerY})`); 
+
+                    overlayPie.selectAll("text")
+                        .data(pie)
+                        .enter().append("text")
+                        .attr("transform", d => {
+                            
+                            const [x, y] = enlargedArc.centroid(d);
+                            const scaleFactor = 1.5;
+                            return `translate(${x * scaleFactor + centerX}, ${y * scaleFactor + centerY})`;
+                        })
+                        .attr("text-anchor", "middle")
+                        .attr("fill", "white")
+                        .attr("font-size", "14px")
+                        .text(d => {
+                            const percentage = Math.round((d.data.count / total) * 100);
+                            return percentage > 0 ? `${percentage}%` : ""; 
+                        });
+
+
+                    overlay
+                        .style("display", "block")
+                        .style("left", `${event.pageX + 10}px`)
+                        .style("top", `${event.pageY + 10}px`);
+
+                }).on("mouseout", function () {
+                    d3.select(this)
+                        .attr("stroke", "white")
+                        .attr("stroke-width", 1);
+
+                    overlay.style("display", "none");
+                });
+
+
             });
         });
 
         // Draw legend
         const legendData = [...new Set(final_data.map(d => d.injury_severity))];
         const legend = svg.append("g")
-            .attr("transform", `translate(${svgWidth - margin.right - 20}, ${margin.top})`); // Shift the legend towards the right
+            .attr("transform", `translate(${svgWidth - margin.right - 20}, ${margin.top})`);
 
         legendData.forEach((severity, i) => {
             legend.append("rect")
@@ -268,5 +359,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 .text(severity);
         });
     }
+
 
 });
