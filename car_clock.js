@@ -162,6 +162,8 @@ function drawSpiderChart(){
     console.log(noOfAccidentsMap);
 
     RadarChart("#car-clock-svg", spiderData);
+
+    VehicleBodyTypeWheel();
 }
 
 function RadarChart(id, data, options) {
@@ -189,7 +191,7 @@ function RadarChart(id, data, options) {
 	}//if
 	
 	//If the supplied maxValue is smaller than the actual one, replace by the max in the data
-	var maxValue = Math.max(cfg.maxValue, d3.max(data, function(i){return d3.max(i.map(function(o){return o.value;}))}));
+	var maxValue = Math.max(cfg.maxValue, d3.max(data, function(i){return d3.max(i.map(function(o){return o.value;}))}))+1;
 		
 	var allAxis = (data[0].map(function(i, j){return i.axis})),	//Names of each axis
 		total = allAxis.length,					//The number of different axes
@@ -209,23 +211,21 @@ function RadarChart(id, data, options) {
 	d3.select(id).select("svg").remove();
 	
 	//Initiate the radar chart SVG
-	var svg = d3.select(id).append("svg")
-			.attr("width",  cfg.w + cfg.margin.left + cfg.margin.right)
-			.attr("height", cfg.h + cfg.margin.top + cfg.margin.bottom)
-			.attr("class", "radar"+id);
+	let svg = d3.select(id)
+			.attr("class", "radar_"+id);
 
-    svg.append("image")
+	//Append a g element		
+	var g = svg.append("g")
+			.attr("transform", "translate(" + ((cfg.w/2 + cfg.margin.left)+100) + "," + ((cfg.h/2 + cfg.margin.top)+40) + ")");
+
+    g.append("image")
         .attr("xlink:href", "grey_car_no_bg.png")  // Replace with your background image path
-        .attr("x", cfg.margin.top)
-        .attr("y", cfg.margin.top)
+        .attr("x", -cfg.w/2)
+        .attr("y", -cfg.h/2)
         .attr("width", cfg.w)
         .attr("height", cfg.h)
         .attr("preserveAspectRatio", "xMidYMid meet")
         .attr("opacity", "0.4");
-
-	//Append a g element		
-	var g = svg.append("g")
-			.attr("transform", "translate(" + (cfg.w/2 + cfg.margin.left) + "," + (cfg.h/2 + cfg.margin.top) + ")");
 	
 	/////////////////////////////////////////////////////////
 	////////// Glow filter for some extra pizzazz ///////////
@@ -276,7 +276,7 @@ function RadarChart(id, data, options) {
 	//Append the labels at each axis
 	axis.append("text")
 		.attr("class", "legend")
-		.style("font-size", "11px")
+		.style("font-size", "20px")
         .style('font-weight', 'bold')
 		.attr("text-anchor", "middle")
 		.attr("dy", "0.35em")
@@ -289,13 +289,23 @@ function RadarChart(id, data, options) {
     axisGrid.selectAll(".levels2")
         .data(d3.range(1,(cfg.levels+1)).reverse())
         .enter()
-         .append("circle")
-         .attr("class", "gridCircle")
-         .attr("r", (d, i) => (radius/cfg.levels*d) + 35)
-         .style("fill", "none")
-         .style("stroke", "#808080")
-         .style("fill-opacity", cfg.opacityCircles)
-         .style("filter" , "url(#glow)"); 
+        .append("path")
+        .attr("class", "gridCircle")
+        .attr("d", d => {
+            let outerRadius = (radius/cfg.levels*d) + 35;
+            let innerRadius = radius/cfg.levels*d; // Adjust the thickness by changing this value
+            return d3.arc()({
+                innerRadius: innerRadius,
+                outerRadius: outerRadius,
+                startAngle: 0,
+                endAngle: Math.PI * 2
+            });
+        })
+        .style("fill", "#BCC6CC")  // Metallic silver fill
+        .style("stroke", "#9BA4AA") // Darker silver stroke
+        .style("fill-opacity", cfg.opacityCircles)
+        .style("filter", "url(#glow)");
+    
 	
 	//The radial line function
 	var radarLine = d3.lineRadial().curve(d3.curveBasisClosed)
@@ -426,4 +436,151 @@ function RadarChart(id, data, options) {
 	  });
 	}//wrap	
 	
+}
+
+function VehicleBodyTypeWheel(){
+
+    // Initial data
+    const options = [];
+    options.push(' ');
+    options.push('ALL');
+    let sortedArr = [...new Set(parsedData.map(d => d[VEHICLE_BODY_TYPE]))].sort();
+    options.push(...sortedArr);
+    options.push(' ');
+    let startIndex = 0;  // Starting index of the visible window
+    const visibleCount = 3;
+
+    let svg = d3.select('#car-clock-svg')
+        .select('g');
+
+    // Create a group for all elements
+    const group = svg.append('g')
+        .attr('transform', 'translate(160, -150)');
+
+    group.append('text')
+        .text('Vehicle Body Type')
+        .attr('fill', 'white')
+        .attr('x', 190)
+        .attr('y', 50)
+        .style('font-weight', 'bold');
+
+    // Create circular wheel background
+    group.append("rect")
+        .attr("x", 130)      // 150 - width/2 to center
+        .attr("y", 110)      // 150 - height/2 to center
+        .attr("width", 40)   // Similar scale to the circle (diameter)
+        .attr("height", 80)  // Making it square
+        .attr("rx", 20)    // Horizontal corner radius
+        .attr("ry", 20)
+        .style("fill", "#BCC6CC")  // Metallic silver fill
+        .style("stroke", "#808080") // Darker silver stroke
+        .style("stroke-width", "2px")
+        .style("fill-opacity", 0.1)
+        .style("filter", "url(#glow)");
+
+    // Add horizontal lines inside rectangle
+    group.selectAll(".divider")
+        .data([1, 2, 3])  // For two lines dividing into three sections
+        .enter()
+        .append("line")
+        .attr("class", "divider")
+        .attr("x1", 130)  // Start from left edge of rectangle
+        .attr("x2", 170)  // End at right edge of rectangle
+        .attr("y1", d => 110 + (d * 80/4))  // Divide height into 3 equal parts
+        .attr("y2", d => 110 + (d * 80/4))
+        .attr("stroke", "#808080")
+        .attr("stroke-width", 1);
+
+
+    // Create arrows
+    const arrowUp = group.append("path")
+        .attr("d", "M150,80 L130,100 L170,100 Z")
+        .attr("fill", "#333")
+        .style("opacity", 0.7)
+        .style("cursor", "pointer");
+
+    const arrowDown = group.append("path")
+        .attr("d", "M150,220 L130,200 L170,200 Z")
+        .attr("fill", "#333")
+        .style("opacity", 0.7)
+        .style("cursor", "pointer");
+
+    // Create text elements
+    group.selectAll(".option")
+        .data(options)
+        .join("text")
+        .attr("class", "option")
+        .attr("x", 190)
+        .attr("y", (d, i) => 100 + i*50)
+        .text(d => d)
+        .style("font-size", "16px")
+        .attr('fill', 'white')
+        .style("opacity", (d, i) => i === startIndex ? 1 : 0.3);
+
+    function updateVisibleOptions() {
+        // Get current visible options
+        const visibleOptions = options.slice(startIndex, startIndex + visibleCount);
+
+        // Bind data to the selection
+        const texts = group.selectAll(".option").data(visibleOptions);
+
+        // Handle exit (remove elements not in the data)
+        texts.exit()
+        .remove();
+
+        // Handle enter (create new elements for new data)
+        const enter = texts.enter()
+            .append("text")
+            .attr("class", "option")
+            .attr("x", 190)
+            .style("opacity", 0)
+            .text(d => d)
+            .style("font-size", "16px");
+
+        // Handle update (modify existing elements)
+        const update = texts
+            .attr("x", 190) // Update attributes (optional, ensures consistency)
+            .text(d => d); // Update text for existing elements
+
+        // Merge enter and update for transitions
+        enter.merge(update)
+            .transition()
+            .duration(1000)
+            .attr("y", (d, i) => 100 + i*50)
+            .style("opacity", (d, i) => i === Math.floor(visibleCount / 2) ? 1 : 0.3);
+    }
+
+    // Arrow click handlers
+    function moveDown() {
+        startIndex = Math.max(0, startIndex - 1);
+        updateVisibleOptions();
+    }
+
+    function moveUp() {
+        startIndex = Math.min(options.length - visibleCount, startIndex + 1);
+        updateVisibleOptions();
+    }
+
+    // Add click events to arrows
+    arrowUp.on("click", moveUp);
+    arrowDown.on("click", moveDown);
+
+    // Add hover effects
+    arrowUp.on("mouseover", function() {
+        d3.select(this).transition().duration(200).attr("fill", "#666");
+    })
+    .on("mouseout", function() {
+        d3.select(this).transition().duration(200).attr("fill", "#333");
+    });
+
+    arrowDown.on("mouseover", function() {
+        d3.select(this).transition().duration(200).attr("fill", "#666");
+    })
+    .on("mouseout", function() {
+        d3.select(this).transition().duration(200).attr("fill", "#333");
+    });
+
+    // Initial render
+    updateVisibleOptions();
+
 }
