@@ -1,12 +1,26 @@
 
 var spiderData = [];
-var locationInjuryCountObj = {}; //to show on hover 
+var locationInjuryCountMap = new Map(); //to show on hover 
+var noOfAccidentsMap = new Map(); //to show on hover 
 var selectedVehicleBodyType = "ALL";
 
 const INJURY_SEVERITY = 'injury_severity';
 const VEHICLE_FIRST_IMPACT_LOCATION = 'vehicle_first_impact_location';
 const VEHICLE_BODY_TYPE = 'vehicle_body_type';
-const directions = new Set(['twelve', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven']);
+const directions = new Map([
+    ['twelve', 'XII'], 
+    ['one', 'I'], 
+    ['two', 'II'], 
+    ['three', 'III'], 
+    ['four', 'IV'], 
+    ['five', 'V'], 
+    ['six', 'VI'], 
+    ['seven', 'VII'], 
+    ['eight', 'VIII'], 
+    ['nine', 'IX'], 
+    ['ten', 'X'], 
+    ['eleven', 'XI']
+]);
 const injurySeverityMap = new Map([
     ['fatal', 6],
     ['serious', 5], 
@@ -33,7 +47,8 @@ $(document).ready(() => {
     }).then(data =>{
 
         let noOfAccidentsData = [];
-        let noOfAccidentsMap = new Map();
+        noOfAccidentsMap = new Map();
+        locationInjuryCountMap = new Map();
         let injurySeverityData = [];
         let injuryCountMap = new Map();
 
@@ -67,10 +82,14 @@ $(document).ready(() => {
             }
         });
 
+        let countScale = d3.scaleLinear()
+            .range([4, 14])
+            .domain([d3.min(noOfAccidentsMap.values()), d3.max(noOfAccidentsMap.values())]);
+
         noOfAccidentsMap.forEach((value, key) => {
             noOfAccidentsData.push({
                 axis: key,
-                value: value
+                value: parseInt(countScale(value))
             });
         });
 
@@ -96,35 +115,42 @@ $(document).ready(() => {
                     sum: product
                 });
             }
-
-            if(axis in locationInjuryCountObj){
-                let obj = locationInjuryCountObj[axis];
+            
+            if (locationInjuryCountMap.has(axis)) {
+                let obj = locationInjuryCountMap.get(axis);
                 obj[injury] = value;
-            }else{
+            } else {
                 let obj = {};
                 obj[injury] = value;
-                locationInjuryCountObj[axis] = obj;
+                locationInjuryCountMap.set(axis, obj);
             }
         });
 
         for (let [key, value] of injuryAxisCountSumMap.entries()) {
             injurySeverityData.push({
                 axis: key,
-                value: (value.sum / (value.count*6))*100000
+                value: (value.sum / (value.count))
             });
         }
 
         spiderData.push(noOfAccidentsData);
         spiderData.push(injurySeverityData);
 
-        let directionsArr = Array.from(directions);
+        let directionsArr = Array.from(directions.keys());
 
         spiderData.forEach(arr => {
             arr.sort((a,b) => directionsArr.indexOf(a.axis) - directionsArr.indexOf(b.axis));
         });
 
+        let severityScale = d3.scaleLinear()
+            .range([4, 14])
+            .domain([d3.min(spiderData[1].map(d => d.value)), d3.max(spiderData[1].map(d => d.value))]);
+
+        spiderData[1].forEach(d => d.value = parseInt(severityScale(d.value)));
+
         console.log(spiderData);
-        console.log(locationInjuryCountObj);
+        console.log(locationInjuryCountMap);
+        console.log(noOfAccidentsMap);
 
         drawSpiderChart();
     });
@@ -144,12 +170,12 @@ function RadarChart(id, data, options) {
 	 maxValue: 0, 			//What is the value that the biggest circle will represent
 	 labelFactor: 1.07, 	//How much farther than the radius of the outer circle should the labels be placed
 	 wrapWidth: 60, 		//The number of pixels after which a label needs to be given a new line
-	 opacityArea: 0.35, 	//The opacity of the area of the blob
-	 dotRadius: 4, 			//The size of the colored circles of each blog
+	 opacityArea: 0.4, 	//The opacity of the area of the blob
+	 dotRadius: 5, 			//The size of the colored circles of each blog
 	 opacityCircles: 0.1, 	//The opacity of the circles of each blob
 	 strokeWidth: 2, 		//The width of the stroke around each blob
 	 roundStrokes: false,	//If true the area and stroke will follow a round path (cardinal-closed)
-	 color: d3.scaleOrdinal(d3.schemeCategory10)	//Color function
+	 color: d3.scaleOrdinal().range(['#1E90FF', '#FF8C00'])	//Color function
 	};
 	
 	//Put all of the options into a variable called cfg
@@ -192,7 +218,7 @@ function RadarChart(id, data, options) {
         .attr("width", cfg.w)
         .attr("height", cfg.h)
         .attr("preserveAspectRatio", "xMidYMid meet")
-        .attr("opacity", "0.7");
+        .attr("opacity", "0.4");
 
 	//Append a g element		
 	var g = svg.append("g")
@@ -222,27 +248,11 @@ function RadarChart(id, data, options) {
 	   .enter()
 		.append("circle")
 		.attr("class", "gridCircle")
-		.attr("r", function(d, i){return radius/cfg.levels*d;})
-		.style("fill", "#CDCDCD")
+		.attr("r", (d, i) => radius/cfg.levels*d)
+		.style("fill", "#FFFFFF")
 		.style("stroke", "#CDCDCD")
 		.style("fill-opacity", cfg.opacityCircles)
 		.style("filter" , "url(#glow)"); 
-
-	//Text indicating at what % each level is
-	axisGrid.selectAll(".axisLabel")
-	   .data(d3.range(1,(cfg.levels+1)).reverse())
-	   .enter().append("text")
-	   .attr("class", "axisLabel")
-	   .attr("x", 4)
-	   .attr("y", function(d){return -d*radius/cfg.levels;})
-	   .attr("dy", "0.4em")
-	   .style("font-size", "10px")
-	   .attr("fill", "#CDCDCD")
-	   .text(function(d,i) { return maxValue * d/cfg.levels; });
-
-	/////////////////////////////////////////////////////////
-	//////////////////// Draw the axes //////////////////////
-	/////////////////////////////////////////////////////////
 	
 	//Create the straight lines radiating outward from the center
 	var axis = axisGrid.selectAll(".axis")
@@ -266,15 +276,11 @@ function RadarChart(id, data, options) {
 		.style("font-size", "11px")
 		.attr("text-anchor", "middle")
 		.attr("dy", "0.35em")
-        .attr("fill", "#CDCDCD")
+        .attr("fill", "#FFFFFF")
 		.attr("x", (d, i) => rScale(maxValue * cfg.labelFactor) * Math.cos(angleSlice*i - Math.PI/2))
 		.attr("y", (d, i) => rScale(maxValue * cfg.labelFactor) * Math.sin(angleSlice*i - Math.PI/2))
-		.text(function(d){return d})
+		.text(d => directions.get(d))
 		.call(wrap, cfg.wrapWidth);
-
-	/////////////////////////////////////////////////////////
-	///////////// Draw the radar chart blobs ////////////////
-	/////////////////////////////////////////////////////////
 	
 	//The radial line function
 	var radarLine = d3.lineRadial().curve(d3.curveBasisClosed)
@@ -333,11 +339,9 @@ function RadarChart(id, data, options) {
 		.attr("cx", (d, i) => rScale(d.value) * Math.cos(angleSlice*i - Math.PI/2))
 		.attr("cy", (d, i) => rScale(d.value) * Math.sin(angleSlice*i - Math.PI/2))
 		.style("fill", (d, i, j) => cfg.color(j))
-		.style("fill-opacity", 0.8);
-
-	/////////////////////////////////////////////////////////
-	//////// Append invisible circles for tooltip ///////////
-	/////////////////////////////////////////////////////////
+        .attr('stroke-width', cfg.strokeWidth + "px")
+        .attr('stroke', (d, i, j) => cfg.color(j))
+        .style("filter" , "url(#glow)");
 	
 	//Wrapper for the invisible circles on top
 	var blobCircleWrapper = g.selectAll(".radarCircleWrapper")
@@ -374,14 +378,12 @@ function RadarChart(id, data, options) {
 	//Set up the small tooltip for when you hover over a circle
 	var tooltip = g.append("text")
 		.attr("class", "tooltip")
-        .attr("fill", "#CDCDCD")
+        .attr("fill", "#FFFFFF")
+        .style("stroke", 'black')
+        .style("stroke-width", '0.5')
+        .style('weight', 'bold')
 		.style("opacity", 0);
-	
-	/////////////////////////////////////////////////////////
-	/////////////////// Helper Function /////////////////////
-	/////////////////////////////////////////////////////////
 
-	//Taken from http://bl.ocks.org/mbostock/7555321
 	//Wraps SVG text	
 	function wrap(text, width) {
 	  text.each(function() {
