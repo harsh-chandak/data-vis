@@ -3,6 +3,7 @@ var spiderData = [];
 var locationInjuryCountMap = new Map(); //to show on hover 
 var noOfAccidentsMap = new Map(); //to show on hover 
 var selectedVehicleBodyType = "ALL";
+var parsedData;
 
 const INJURY_SEVERITY = 'injury_severity';
 const VEHICLE_FIRST_IMPACT_LOCATION = 'vehicle_first_impact_location';
@@ -46,117 +47,119 @@ $(document).ready(() => {
 
     }).then(data =>{
 
-        let noOfAccidentsData = [];
-        noOfAccidentsMap = new Map();
-        locationInjuryCountMap = new Map();
-        let injurySeverityData = [];
-        let injuryCountMap = new Map();
-
-        data.forEach(d => {
-            
-            if(d[VEHICLE_FIRST_IMPACT_LOCATION] && (selectedVehicleBodyType === 'ALL' || d[VEHICLE_BODY_TYPE] === selectedVehicleBodyType)){
-
-                let axis = d[VEHICLE_FIRST_IMPACT_LOCATION].split(' ')[0].toLowerCase();
-                if(directions.has(axis)){
-
-                    //number of accidents
-                    if(noOfAccidentsMap.has(axis)){
-                        noOfAccidentsMap.set(axis, noOfAccidentsMap.get(axis)+1);
-                    }else{
-                        noOfAccidentsMap.set(axis, 1);
-                    }
-
-                    //injury severity
-                    let injury = Array.from(injurySeverityMap.keys())
-                        .map(key => (d[INJURY_SEVERITY] && d[INJURY_SEVERITY].toLowerCase().includes(key) ? key : null))
-                        .find(key => key !== null) || 'unknown';
-
-                    let injuryKey = axis+'##'+injury;
-
-                    if(injuryCountMap.has(injuryKey)){
-                        injuryCountMap.set(injuryKey, injuryCountMap.get(injuryKey)+1);
-                    }else{
-                        injuryCountMap.set(injuryKey, 1);
-                    }
-                }
-            }
-        });
-
-        let countScale = d3.scaleLinear()
-            .range([4, 14])
-            .domain([d3.min(noOfAccidentsMap.values()), d3.max(noOfAccidentsMap.values())]);
-
-        noOfAccidentsMap.forEach((value, key) => {
-            noOfAccidentsData.push({
-                axis: key,
-                value: parseInt(countScale(value))
-            });
-        });
-
-        let injuryAxisCountSumMap = new Map();
-
-        injuryCountMap.forEach((value, key) => {
-
-            let axis = key.split('##')[0];
-            let injury = key.split('##')[1];
-
-            let product = value * injurySeverityMap.get(injury);
-
-            if(injuryAxisCountSumMap.has(axis)){
-                let sum = injuryAxisCountSumMap.get(axis).sum + product;
-                let count = injuryAxisCountSumMap.get(axis).count + value;
-                injuryAxisCountSumMap.set(axis, {
-                    count: count,
-                    sum: sum
-                });
-            }else{
-                injuryAxisCountSumMap.set(axis, {
-                    count: value,
-                    sum: product
-                });
-            }
-            
-            if (locationInjuryCountMap.has(axis)) {
-                let obj = locationInjuryCountMap.get(axis);
-                obj[injury] = value;
-            } else {
-                let obj = {};
-                obj[injury] = value;
-                locationInjuryCountMap.set(axis, obj);
-            }
-        });
-
-        for (let [key, value] of injuryAxisCountSumMap.entries()) {
-            injurySeverityData.push({
-                axis: key,
-                value: (value.sum / (value.count))
-            });
-        }
-
-        spiderData.push(noOfAccidentsData);
-        spiderData.push(injurySeverityData);
-
-        let directionsArr = Array.from(directions.keys());
-
-        spiderData.forEach(arr => {
-            arr.sort((a,b) => directionsArr.indexOf(a.axis) - directionsArr.indexOf(b.axis));
-        });
-
-        let severityScale = d3.scaleLinear()
-            .range([4, 14])
-            .domain([d3.min(spiderData[1].map(d => d.value)), d3.max(spiderData[1].map(d => d.value))]);
-
-        spiderData[1].forEach(d => d.value = parseInt(severityScale(d.value)));
-
-        console.log(spiderData);
-        console.log(locationInjuryCountMap);
-        console.log(noOfAccidentsMap);
+        parsedData = data;
 
         drawSpiderChart();
     });
 });
 
 function drawSpiderChart(){
+
+    let noOfAccidentsData = [];
+    noOfAccidentsMap = new Map();
+    locationInjuryCountMap = new Map();
+    let injurySeverityData = [];
+    let injuryCountMap = new Map();
+
+    parsedData.forEach(d => {
+        
+        if(d[VEHICLE_FIRST_IMPACT_LOCATION] && (selectedVehicleBodyType === 'ALL' || d[VEHICLE_BODY_TYPE] === selectedVehicleBodyType)){
+
+            let axis = d[VEHICLE_FIRST_IMPACT_LOCATION].split(' ')[0].toLowerCase();
+            if(directions.has(axis)){
+
+                //number of accidents
+                if(noOfAccidentsMap.has(axis)){
+                    noOfAccidentsMap.set(axis, noOfAccidentsMap.get(axis)+1);
+                }else{
+                    noOfAccidentsMap.set(axis, 1);
+                }
+
+                //injury severity
+                let injury = Array.from(injurySeverityMap.keys())
+                    .map(key => (d[INJURY_SEVERITY] && d[INJURY_SEVERITY].toLowerCase().includes(key) ? key : null))
+                    .find(key => key !== null) || 'unknown';
+
+                let injuryKey = axis+'##'+injury;
+
+                if(injuryCountMap.has(injuryKey)){
+                    injuryCountMap.set(injuryKey, injuryCountMap.get(injuryKey)+1);
+                }else{
+                    injuryCountMap.set(injuryKey, 1);
+                }
+            }
+        }
+    });
+
+    let countScale = d3.scaleLinear()
+        .range([4, 14])
+        .domain([d3.min(noOfAccidentsMap.values()), d3.max(noOfAccidentsMap.values())]);
+
+    noOfAccidentsMap.forEach((value, key) => {
+        noOfAccidentsData.push({
+            axis: key,
+            value: parseInt(countScale(value))
+        });
+    });
+
+    let injuryAxisCountSumMap = new Map();
+
+    injuryCountMap.forEach((value, key) => {
+
+        let axis = key.split('##')[0];
+        let injury = key.split('##')[1];
+
+        let product = value * injurySeverityMap.get(injury);
+
+        if(injuryAxisCountSumMap.has(axis)){
+            let sum = injuryAxisCountSumMap.get(axis).sum + product;
+            let count = injuryAxisCountSumMap.get(axis).count + value;
+            injuryAxisCountSumMap.set(axis, {
+                count: count,
+                sum: sum
+            });
+        }else{
+            injuryAxisCountSumMap.set(axis, {
+                count: value,
+                sum: product
+            });
+        }
+        
+        if (locationInjuryCountMap.has(axis)) {
+            let obj = locationInjuryCountMap.get(axis);
+            obj[injury] = value;
+        } else {
+            let obj = {};
+            obj[injury] = value;
+            locationInjuryCountMap.set(axis, obj);
+        }
+    });
+
+    for (let [key, value] of injuryAxisCountSumMap.entries()) {
+        injurySeverityData.push({
+            axis: key,
+            value: (value.sum / (value.count))
+        });
+    }
+
+    spiderData.push(noOfAccidentsData);
+    spiderData.push(injurySeverityData);
+
+    let directionsArr = Array.from(directions.keys());
+
+    spiderData.forEach(arr => {
+        arr.sort((a,b) => directionsArr.indexOf(a.axis) - directionsArr.indexOf(b.axis));
+    });
+
+    let severityScale = d3.scaleLinear()
+        .range([4, 14])
+        .domain([d3.min(spiderData[1].map(d => d.value)), d3.max(spiderData[1].map(d => d.value))]);
+
+    spiderData[1].forEach(d => d.value = parseInt(severityScale(d.value)));
+
+    console.log(spiderData);
+    console.log(locationInjuryCountMap);
+    console.log(noOfAccidentsMap);
 
     RadarChart("#car-clock-svg", spiderData);
 }
@@ -249,8 +252,8 @@ function RadarChart(id, data, options) {
 		.append("circle")
 		.attr("class", "gridCircle")
 		.attr("r", (d, i) => radius/cfg.levels*d)
-		.style("fill", "#FFFFFF")
-		.style("stroke", "#CDCDCD")
+		.style("fill", "none")
+		.style("stroke", "#808080")
 		.style("fill-opacity", cfg.opacityCircles)
 		.style("filter" , "url(#glow)"); 
 	
@@ -267,13 +270,14 @@ function RadarChart(id, data, options) {
 		.attr("x2", (d, i) => rScale(maxValue) * Math.cos(angleSlice*i - Math.PI/2))
 		.attr("y2", (d, i) => rScale(maxValue) * Math.sin(angleSlice*i - Math.PI/2))
 		.attr("class", "line")
-		.style("stroke", "white")
+		.style("stroke", "#808080")
 		.style("stroke-width", "2px");
 
 	//Append the labels at each axis
 	axis.append("text")
 		.attr("class", "legend")
 		.style("font-size", "11px")
+        .style('font-weight', 'bold')
 		.attr("text-anchor", "middle")
 		.attr("dy", "0.35em")
         .attr("fill", "#FFFFFF")
@@ -281,6 +285,17 @@ function RadarChart(id, data, options) {
 		.attr("y", (d, i) => rScale(maxValue * cfg.labelFactor) * Math.sin(angleSlice*i - Math.PI/2))
 		.text(d => directions.get(d))
 		.call(wrap, cfg.wrapWidth);
+
+    axisGrid.selectAll(".levels2")
+        .data(d3.range(1,(cfg.levels+1)).reverse())
+        .enter()
+         .append("circle")
+         .attr("class", "gridCircle")
+         .attr("r", (d, i) => (radius/cfg.levels*d) + 35)
+         .style("fill", "none")
+         .style("stroke", "#808080")
+         .style("fill-opacity", cfg.opacityCircles)
+         .style("filter" , "url(#glow)"); 
 	
 	//The radial line function
 	var radarLine = d3.lineRadial().curve(d3.curveBasisClosed)
