@@ -1,4 +1,10 @@
 
+/*
+    1. fix injury severity types in lables, proper word and rank wise
+    2. transitions
+    3. 
+*/
+
 var spiderData = [];
 var locationInjuryCountMap = new Map(); //to show on hover 
 var noOfAccidentsMap = new Map(); //to show on hover 
@@ -147,6 +153,9 @@ function filterData(){
             value: (value.sum / (value.count))
         });
     }
+
+    noOfAccidentsData.forEach(d => d.webType = 'count');
+    injurySeverityData.forEach(d => d.webType = 'injury');
 
     spiderData.push(noOfAccidentsData);
     spiderData.push(injurySeverityData);
@@ -403,39 +412,79 @@ function plotRadarChartData(){
         .attr("class", "radarCircleWrapper");
         
     //Append a set of invisible circles on top for the mouseover pop-up
-    blobCircleWrapper.selectAll(".radarInvisibleCircle")
-        .data(function(d,i) { return d; })
+    blobCircleWrapper.selectAll('[class*="radarInvisibleCircle_"]')
+        .data(d => d)
         .enter().append("circle")
-        .attr("class", "radarInvisibleCircle")
+        .attr("class", (d, i) => "radarInvisibleCircle_"+d.webType)
         .attr("r", cfg.dotRadius*1.5)
         .attr("cx", (d,i) => rScale(d.value) * Math.cos(angleSlice*i - Math.PI/2))
         .attr("cy", (d,i) => rScale(d.value) * Math.sin(angleSlice*i - Math.PI/2))
         .style("fill", "none")
         .style("pointer-events", "all")
-        .on("mouseover", function(d,i) {
-            newX =  parseFloat(d3.select(this).attr('cx')) - 10;
-            newY =  parseFloat(d3.select(this).attr('cy')) - 10;
+        .on("mouseover", function(e,i) {
+            newX =  parseFloat(d3.select(this).attr('cx'))+ 10;
+            newY =  parseFloat(d3.select(this).attr('cy')) - 45;
+
+            let webType = e.target.className.baseVal.split('_')[1];
                     
-            tooltip
-                .attr('x', newX)
+            tooltip.attr('x', newX)
                 .attr('y', newY)
-                .text(i.value)
                 .transition().duration(200)
                 .style('opacity', 1);
+
+            let tooltipHtml = '';
+            if(webType === 'count'){
+                tooltip.attr("width", 170)
+                    .attr("height", 30)
+                    .attr("rx", 10)      // Rounded corners
+                    .attr("ry", 10);
+                tooltipHtml = '<tspan style="font-weight:bold;">No. of Accidents:</tspan> '+noOfAccidentsMap.get(i.axis);
+            }else{
+                tooltip.attr("width", 130)
+                    .attr("height", 140)
+                    .attr("rx", 10)      // Rounded corners
+                    .attr("ry", 10);
+                tooltipHtml = '<tspan style="font-weight:bold;">No. Injury Severity:</tspan>';
+                for (const key in locationInjuryCountMap.get(i.axis)) {
+                    if (Object.prototype.hasOwnProperty.call(locationInjuryCountMap.get(i.axis), key)) {
+                        const element = locationInjuryCountMap.get(i.axis)[key];
+                        tooltipHtml += `<tspan x="${newX+10}" dy="1.5em">${key}: ${element}</tspan>`;
+                    }
+                }
+            }
+
+            tooltipText.html(tooltipHtml)
+                .attr('x', newX+10)
+                .attr('y', newY+20)
+                .style("opacity", 1);
         })
-        .on("mouseout", function(){
-            tooltip.transition().duration(200)
-                .style("opacity", 0);
+        .on("mouseout", function(e, i){
+            tooltip.style("opacity", 0);
+            tooltipText.html('');
         });
-        
-    //Set up the small tooltip for when you hover over a circle
-    var tooltip = g.append("text")
-        .attr("class", "tooltip")
-        .attr("fill", "#FFFFFF")
-        .style("stroke", 'black')
-        .style("stroke-width", '0.5')
-        .style('weight', 'bold')
+
+    var tooltip = g.append("rect")
+        .attr("class", 'tooltip-box')
+        .attr("width", 220)
+        .attr("height", 30)
+        .attr("rx", 10)      // Rounded corners
+        .attr("ry", 10)
+        .style("fill", "white")
+        .style("stroke", '#808080')
+        .style("stroke-width", 2)
+        .style("position", "absolute")
+        .style("background-color", "#f8f9f9")
+        .style("padding", "5px")
+        .style('opacity', 0);
+
+    var tooltipText = g.append("text")
+        .attr("class", 'tooltip-text')
+        .style("font-size", "12px")
+        .style("fill", "black")
+        .style("color", 'black')
+        .attr('fill', 'black')
         .style("opacity", 0);
+
 }
 
 function VehicleBodyTypeWheel(){
