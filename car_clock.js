@@ -1,6 +1,6 @@
 
 /*
-    1. fix injury severity types in lables, proper word and rank wise
+    1. fix injury severity types in lables, proper word and rank wise -- done
     2. transitions
     3. 
 */
@@ -34,12 +34,12 @@ const directions = new Map([
     ['eleven', 'XI']
 ]);
 const injurySeverityMap = new Map([
-    ['fatal', 6],
-    ['serious', 5], 
-    ['minor', 4], 
-    ['possible', 3], 
-    ['no', 2], 
-    ['unknown', 1] 
+    ['fatal', {value:6, label: 'Fatal Injury'}],
+    ['serious', {value:5, label: 'Serious Injury'}], 
+    ['minor', {value:4, label: 'Minor Injury'}], 
+    ['possible', {value:3, label: 'Possible Injury'}], 
+    ['no', {value:2, label: 'No Injury'}], 
+    ['unknown', {value:1, label: 'Unknown Injury'}] 
 ]);
 
 $(document).ready(() => {
@@ -121,7 +121,7 @@ function filterData(){
         let axis = key.split('##')[0];
         let injury = key.split('##')[1];
 
-        let product = value * injurySeverityMap.get(injury);
+        let product = value * injurySeverityMap.get(injury).value;
 
         if(injuryAxisCountSumMap.has(axis)){
             let sum = injuryAxisCountSumMap.get(axis).sum + product;
@@ -353,84 +353,63 @@ function RadarChart() {
 
 function plotRadarChartData(){
 
-    //Create a wrapper for the blobs	
-	var blobWrapper = g.selectAll(".radarWrapper")
-        .data(spiderData)
-        .enter().append("g")
-        .attr("class", "radarWrapper");
-            
-    //Append the backgrounds	
-    blobWrapper
+    // Append the backgrounds
+    let radarArea = g.selectAll(".radarArea")
+        .data(spiderData);
+
+    radarArea.enter()
         .append("path")
+        .merge(radarArea)
         .attr("class", "radarArea")
-        .attr("d", (d, i) => radarLine(d))
         .style("fill", (d, i) => cfg.color(i))
         .style("fill-opacity", cfg.opacityArea)
+        .style("stroke-width", cfg.strokeWidth + "px")
+        .style("stroke", (d, i) => cfg.color(i))
         .on('mouseover', function (d,i){
-            //Dim all blobs
+            // Dim all blobs
             d3.selectAll(".radarArea")
                 .transition().duration(200)
                 .style("fill-opacity", 0.1); 
-            //Bring back the hovered over blob
+            // Bring back the hovered over blob
             d3.select(this)
                 .transition().duration(200)
                 .style("fill-opacity", 0.7);	
         })
         .on('mouseout', function(){
-            //Bring back all blobs
+            // Bring back all blobs
             d3.selectAll(".radarArea")
                 .transition().duration(200)
                 .style("fill-opacity", cfg.opacityArea);
-        });
+        })
+        .transition()
+        .duration(1000)
+        .attr("d", (d, i) => radarLine(d));	
 
-    //Create the outlines	
-	blobWrapper.append("path")
-        .attr("class", "radarStroke")
-        .attr("d", (d, i) => radarLine(d))
-        .style("stroke-width", cfg.strokeWidth + "px")
-        .style("stroke", (d, i) => cfg.color(i))
-        .style("fill", "none")
-        .style("filter" , "url(#glow)");		
+    // Append the circles
+    let flatMap = spiderData.flatMap((d, i) => d.map(v => ({
+        value: v.value, 
+        color: cfg.color(i),
+        axis: v.axis,
+        webType: v.webType
+    })));
+    let radarCircle = g.selectAll('[class*="radarInvisibleCircle_"]')
+        .data(flatMap);
 
-    //Append the circles
-    blobWrapper.selectAll(".radarCircle")
-        .data((d, i) => d)
-        .enter().append("circle")
-        .attr("class", "radarCircle")
-        .attr("r", cfg.dotRadius)
-        .attr("cx", (d, i) => rScale(d.value) * Math.cos(angleSlice*i - Math.PI/2))
-        .attr("cy", (d, i) => rScale(d.value) * Math.sin(angleSlice*i - Math.PI/2))
-        .style("fill", (d, i, j) => cfg.color(j))
-        .attr('stroke-width', cfg.strokeWidth + "px")
-        .attr('stroke', (d, i, j) => cfg.color(j))
-        .style("filter" , "url(#glow)");
-
-    //Wrapper for the invisible circles on top
-    var blobCircleWrapper = g.selectAll(".radarCircleWrapper")
-        .data(spiderData)
-        .enter().append("g")
-        .attr("class", "radarCircleWrapper");
-        
-    //Append a set of invisible circles on top for the mouseover pop-up
-    blobCircleWrapper.selectAll('[class*="radarInvisibleCircle_"]')
-        .data(d => d)
-        .enter().append("circle")
+    radarCircle.enter()
+        .append("circle")
+        .merge(radarCircle)
         .attr("class", (d, i) => "radarInvisibleCircle_"+d.webType)
-        .attr("r", cfg.dotRadius*1.5)
-        .attr("cx", (d,i) => rScale(d.value) * Math.cos(angleSlice*i - Math.PI/2))
-        .attr("cy", (d,i) => rScale(d.value) * Math.sin(angleSlice*i - Math.PI/2))
-        .style("fill", "none")
+        .attr("r", cfg.dotRadius)
+        .style("fill", d => d.color)
+        .attr('stroke-width', cfg.strokeWidth + "px")
+        .attr('stroke', d => d.color)
+        .style("filter" , "url(#glow)")
         .style("pointer-events", "all")
         .on("mouseover", function(e,i) {
             newX =  parseFloat(d3.select(this).attr('cx'))+ 10;
             newY =  parseFloat(d3.select(this).attr('cy')) - 45;
 
             let webType = e.target.className.baseVal.split('_')[1];
-                    
-            tooltip.attr('x', newX)
-                .attr('y', newY)
-                .transition().duration(200)
-                .style('opacity', 1);
 
             let tooltipHtml = '';
             if(webType === 'count'){
@@ -440,28 +419,49 @@ function plotRadarChartData(){
                     .attr("ry", 10);
                 tooltipHtml = '<tspan style="font-weight:bold;">No. of Accidents:</tspan> '+noOfAccidentsMap.get(i.axis);
             }else{
-                tooltip.attr("width", 130)
-                    .attr("height", 140)
+                tooltip.attr("width", 150)
+                    .attr("height", 160)
                     .attr("rx", 10)      // Rounded corners
                     .attr("ry", 10);
-                tooltipHtml = '<tspan style="font-weight:bold;">No. Injury Severity:</tspan>';
-                for (const key in locationInjuryCountMap.get(i.axis)) {
-                    if (Object.prototype.hasOwnProperty.call(locationInjuryCountMap.get(i.axis), key)) {
-                        const element = locationInjuryCountMap.get(i.axis)[key];
-                        tooltipHtml += `<tspan x="${newX+10}" dy="1.5em">${key}: ${element}</tspan>`;
-                    }
-                }
+                tooltipHtml = `<tspan style="font-weight:bold;">Injury Severity Level</tspan> <tspan x="${newX+10}" dy="1.5em" style="font-weight:bold;">and No. of Accidents:</tspan>`;
+                let sortedArr = Object.entries(locationInjuryCountMap.get(i.axis)).sort((a,b) => a[1]-b[1]);
+                let sum = 0;
+                let count = 0;
+                sortedArr.forEach(element => {
+                    sum += element[1]*injurySeverityMap.get(element[0]).value;
+                    count += element[1];
+                    tooltipHtml += `<tspan x="${newX+10}" dy="1.5em">${injurySeverityMap.get(element[0]).label} (${injurySeverityMap.get(element[0]).value}): ${element[1]}</tspan>`;
+                });
+                let wavg = Number((sum/count).toFixed(2));
+                tooltipHtml += `<tspan style="font-weight:bold;" x="${newX+10}" dy="1.5em">Severity Average: ${wavg}</tspan>`;
             }
+
+            tooltip.raise(); 
+            tooltipText.raise(); 
 
             tooltipText.html(tooltipHtml)
                 .attr('x', newX+10)
                 .attr('y', newY+20)
                 .style("opacity", 1);
+
+            tooltip.attr('x', newX)
+                .attr('y', newY)
+                .transition().duration(200)
+                .style('opacity', 1);
         })
         .on("mouseout", function(e, i){
             tooltip.style("opacity", 0);
             tooltipText.html('');
-        });
+        })
+        .transition()
+        .duration(1000)
+        .attr("cx", (d, i) => rScale(d.value) * Math.cos(angleSlice*(i % (spiderData[0].length)) - Math.PI/2))
+        .attr("cy", (d, i) => rScale(d.value) * Math.sin(angleSlice*(i % (spiderData[0].length)) - Math.PI/2));
+
+    radarCircle.exit()
+        .transition()
+        .duration(1000)
+        .remove();
 
     var tooltip = g.append("rect")
         .attr("class", 'tooltip-box')
