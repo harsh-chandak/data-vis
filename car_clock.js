@@ -72,6 +72,7 @@ function filterData(){
     locationInjuryCountMap = new Map();
     let injurySeverityData = [];
     let injuryCountMap = new Map();
+    let radarAreaRange = [7, 17];
 
     parsedData.forEach(d => {
         
@@ -104,7 +105,7 @@ function filterData(){
     });
 
     let countScale = d3.scaleLinear()
-        .range([4, 14])
+        .range(radarAreaRange)
         .domain([d3.min(noOfAccidentsMap.values()), d3.max(noOfAccidentsMap.values())]);
 
     noOfAccidentsMap.forEach((value, key) => {
@@ -167,7 +168,7 @@ function filterData(){
     });
 
     let severityScale = d3.scaleLinear()
-        .range([4, 14])
+        .range(radarAreaRange)
         .domain([d3.min(spiderData[1].map(d => d.value)), d3.max(spiderData[1].map(d => d.value))]);
 
     spiderData[1].forEach(d => d.value = parseInt(severityScale(d.value)));
@@ -230,15 +231,6 @@ function RadarChart() {
 	//Append a g element		
 	g = svg.append("g")
 			.attr("transform", "translate(" + ((cfg.w/2 + cfg.margin.left)+100) + "," + ((cfg.h/2 + cfg.margin.top)+40) + ")");
-
-    g.append("image")
-        .attr("xlink:href", "grey_car_no_bg.png")  // Replace with your background image path
-        .attr("x", -cfg.w/2)
-        .attr("y", -cfg.h/2)
-        .attr("width", cfg.w)
-        .attr("height", cfg.h)
-        .attr("preserveAspectRatio", "xMidYMid meet")
-        .attr("opacity", "0.4");
 	
 	//Filter for the outside glow
 	var filter = g.append('defs').append('filter').attr('id','glow'),
@@ -257,10 +249,19 @@ function RadarChart() {
 		.append("circle")
 		.attr("class", "gridCircle")
 		.attr("r", (d, i) => radius/cfg.levels*d)
-		.style("fill", "none")
+		.style("fill", "#BCC6CC")
 		.style("stroke", "#808080")
-		.style("fill-opacity", cfg.opacityCircles)
+		.style("fill-opacity", 0.06)
 		.style("filter" , "url(#glow)"); 
+
+    g.append("image")
+        .attr("xlink:href", "grey_car_no_bg.png")  // Replace with your background image path
+        .attr("x", -cfg.w/2)
+        .attr("y", -cfg.h/2)
+        .attr("width", cfg.w)
+        .attr("height", cfg.h)
+        .attr("preserveAspectRatio", "xMidYMid meet")
+        .attr("opacity", "0.4");
 	
 	//Create the straight lines radiating outward from the center
 	var axis = axisGrid.selectAll(".axis")
@@ -272,8 +273,8 @@ function RadarChart() {
 	axis.append("line")
 		.attr("x1", 0)
 		.attr("y1", 0)
-		.attr("x2", (d, i) => rScale(maxValue) * Math.cos(angleSlice*i - Math.PI/2))
-		.attr("y2", (d, i) => rScale(maxValue) * Math.sin(angleSlice*i - Math.PI/2))
+		.attr("x2", (d, i) => rScale(maxValue) * Math.cos(angleSlice*i - Math.PI/2 - Math.PI/12))
+		.attr("y2", (d, i) => rScale(maxValue) * Math.sin(angleSlice*i - Math.PI/2 - Math.PI/12))
 		.attr("class", "line")
 		.style("stroke", "#808080")
 		.style("stroke-width", "2px");
@@ -308,7 +309,7 @@ function RadarChart() {
         })
         .style("fill", "#BCC6CC")  // Metallic silver fill
         .style("stroke", "#9BA4AA") // Darker silver stroke
-        .style("fill-opacity", cfg.opacityCircles)
+        .style("fill-opacity", 0.15)
         .style("filter", "url(#glow)");
     
 	
