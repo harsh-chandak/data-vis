@@ -2,7 +2,8 @@
 /*
     1. fix injury severity types in lables, proper word and rank wise -- done
     2. transitions -- pending for webs
-    3. legend
+    3. legend -- done
+    4. images
 */
 
 var spiderData = [];
