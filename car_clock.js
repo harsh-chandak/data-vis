@@ -1,8 +1,8 @@
 
 /*
     1. fix injury severity types in lables, proper word and rank wise -- done
-    2. transitions
-    3. 
+    2. transitions -- pending for webs
+    3. legend
 */
 
 var spiderData = [];
@@ -15,6 +15,8 @@ var cfg;
 var rScale;
 var angleSlice;
 var g;
+var showCountWeb = true;
+var showInjuryWeb = true;
 
 const INJURY_SEVERITY = 'injury_severity';
 const VEHICLE_FIRST_IMPACT_LOCATION = 'vehicle_first_impact_location';
@@ -73,6 +75,7 @@ function filterData(){
     let injurySeverityData = [];
     let injuryCountMap = new Map();
     let radarAreaRange = [7, 17];
+    spiderData = [];
 
     parsedData.forEach(d => {
         
@@ -108,56 +111,64 @@ function filterData(){
         .range(radarAreaRange)
         .domain([d3.min(noOfAccidentsMap.values()), d3.max(noOfAccidentsMap.values())]);
 
-    noOfAccidentsMap.forEach((value, key) => {
-        noOfAccidentsData.push({
-            axis: key,
-            value: parseInt(countScale(value))
-        });
-    });
-
-    let injuryAxisCountSumMap = new Map();
-
-    injuryCountMap.forEach((value, key) => {
-
-        let axis = key.split('##')[0];
-        let injury = key.split('##')[1];
-
-        let product = value * injurySeverityMap.get(injury).value;
-
-        if(injuryAxisCountSumMap.has(axis)){
-            let sum = injuryAxisCountSumMap.get(axis).sum + product;
-            let count = injuryAxisCountSumMap.get(axis).count + value;
-            injuryAxisCountSumMap.set(axis, {
-                count: count,
-                sum: sum
-            });
-        }else{
-            injuryAxisCountSumMap.set(axis, {
-                count: value,
-                sum: product
-            });
-        }
+    if(showCountWeb){
         
-        if (locationInjuryCountMap.has(axis)) {
-            let obj = locationInjuryCountMap.get(axis);
-            obj[injury] = value;
-        } else {
-            let obj = {};
-            obj[injury] = value;
-            locationInjuryCountMap.set(axis, obj);
-        }
-    });
-
-    for (let [key, value] of injuryAxisCountSumMap.entries()) {
-        injurySeverityData.push({
-            axis: key,
-            value: (value.sum / (value.count))
+        noOfAccidentsMap.forEach((value, key) => {
+            noOfAccidentsData.push({
+                axis: key,
+                value: parseInt(countScale(value))
+            });
         });
+
+        noOfAccidentsData.forEach(d => d.webType = 'count');
     }
 
-    noOfAccidentsData.forEach(d => d.webType = 'count');
-    injurySeverityData.forEach(d => d.webType = 'injury');
+    if(showInjuryWeb){
 
+        let injuryAxisCountSumMap = new Map();
+
+        injuryCountMap.forEach((value, key) => {
+
+            let axis = key.split('##')[0];
+            let injury = key.split('##')[1];
+
+            let product = value * injurySeverityMap.get(injury).value;
+
+            if(injuryAxisCountSumMap.has(axis)){
+                let sum = injuryAxisCountSumMap.get(axis).sum + product;
+                let count = injuryAxisCountSumMap.get(axis).count + value;
+                injuryAxisCountSumMap.set(axis, {
+                    count: count,
+                    sum: sum
+                });
+            }else{
+                injuryAxisCountSumMap.set(axis, {
+                    count: value,
+                    sum: product
+                });
+            }
+            
+            if (locationInjuryCountMap.has(axis)) {
+                let obj = locationInjuryCountMap.get(axis);
+                obj[injury] = value;
+            } else {
+                let obj = {};
+                obj[injury] = value;
+                locationInjuryCountMap.set(axis, obj);
+            }
+        });
+
+        for (let [key, value] of injuryAxisCountSumMap.entries()) {
+            injurySeverityData.push({
+                axis: key,
+                value: (value.sum / (value.count))
+            });
+        }
+
+        injurySeverityData.forEach(d => d.webType = 'injury');
+    }
+
+    //0 => no of accidents, 1 => injury severity
     spiderData.push(noOfAccidentsData);
     spiderData.push(injurySeverityData);
 
@@ -173,9 +184,6 @@ function filterData(){
 
     spiderData[1].forEach(d => d.value = parseInt(severityScale(d.value)));
 
-    console.log(spiderData);
-    console.log(locationInjuryCountMap);
-    console.log(noOfAccidentsMap);
 }
 
 function drawSpiderChart(){
@@ -309,6 +317,7 @@ function RadarChart() {
         })
         .style("fill", "#BCC6CC")  // Metallic silver fill
         .style("stroke", "#9BA4AA") // Darker silver stroke
+        .attr("stroke-width", 2)
         .style("fill-opacity", 0.15)
         .style("filter", "url(#glow)");
     
@@ -355,20 +364,20 @@ function RadarChart() {
 function plotRadarChartData(){
 
     // Append the backgrounds
-    let radarArea = g.selectAll(".radarArea")
+    let radarArea = g.selectAll('[class*="radarArea_"]')
         .data(spiderData);
 
     radarArea.enter()
         .append("path")
         .merge(radarArea)
-        .attr("class", "radarArea")
+        .attr("class", (d, i) => 'radarArea_'+i)
         .style("fill", (d, i) => cfg.color(i))
         .style("fill-opacity", cfg.opacityArea)
         .style("stroke-width", cfg.strokeWidth + "px")
         .style("stroke", (d, i) => cfg.color(i))
         .on('mouseover', function (d,i){
             // Dim all blobs
-            d3.selectAll(".radarArea")
+            d3.selectAll('[class*="radarArea_"]')
                 .transition().duration(200)
                 .style("fill-opacity", 0.1); 
             // Bring back the hovered over blob
@@ -378,13 +387,22 @@ function plotRadarChartData(){
         })
         .on('mouseout', function(){
             // Bring back all blobs
-            d3.selectAll(".radarArea")
+            d3.selectAll('[class*="radarArea_"]')
                 .transition().duration(200)
                 .style("fill-opacity", cfg.opacityArea);
         })
+        .attr("d", d => radarLine(d.map(() => ({x: 0, y: 0}))))
         .transition()
         .duration(1000)
         .attr("d", (d, i) => radarLine(d));	
+
+    radarArea.exit()
+        .transition()
+        .duration(1000)
+        .ease(d3.easeQuadIn)
+        .attr("d", d => radarLine(d.map(() => ({x: 0, y: 0}))))
+        .style("opacity", 0)
+        .remove();
 
     // Append the circles
     let flatMap = spiderData.flatMap((d, i) => d.map(v => ({
@@ -393,13 +411,14 @@ function plotRadarChartData(){
         axis: v.axis,
         webType: v.webType
     })));
-    let radarCircle = g.selectAll('[class*="radarInvisibleCircle_"]')
+
+    let radarCircle = g.selectAll('[class*="radarCircle_"]')
         .data(flatMap);
 
     radarCircle.enter()
         .append("circle")
         .merge(radarCircle)
-        .attr("class", (d, i) => "radarInvisibleCircle_"+d.webType)
+        .attr("class", (d, i) => "radarCircle_"+d.webType)
         .attr("r", cfg.dotRadius)
         .style("fill", d => d.color)
         .attr('stroke-width', cfg.strokeWidth + "px")
@@ -456,12 +475,14 @@ function plotRadarChartData(){
         })
         .transition()
         .duration(1000)
-        .attr("cx", (d, i) => rScale(d.value) * Math.cos(angleSlice*(i % (spiderData[0].length)) - Math.PI/2))
-        .attr("cy", (d, i) => rScale(d.value) * Math.sin(angleSlice*(i % (spiderData[0].length)) - Math.PI/2));
+        .attr("cx", (d, i) => rScale(d.value) * Math.cos(angleSlice*(i % (Math.max(spiderData[0].length,spiderData[1].length))) - Math.PI/2))
+        .attr("cy", (d, i) => rScale(d.value) * Math.sin(angleSlice*(i % (Math.max(spiderData[0].length,spiderData[1].length))) - Math.PI/2));
 
     radarCircle.exit()
         .transition()
         .duration(1000)
+        .attr("cx", 0)
+        .attr("cy", 0)
         .remove();
 
     var tooltip = g.append("rect")
@@ -505,27 +526,28 @@ function VehicleBodyTypeWheel(){
 
     // Create a group for all elements
     const group = svg.append('g')
-        .attr('transform', 'translate(160, -150)');
+        .attr('transform', 'translate(157, -150)');
 
     group.append('text')
         .text('Vehicle Body Type')
         .attr('fill', 'white')
         .attr('x', 190)
-        .attr('y', 50)
+        .attr('y', 75)
+        .style("font-size", "14px")
         .style('font-weight', 'bold');
 
     // Create circular wheel background
     group.append("rect")
         .attr("x", 130)      // 150 - width/2 to center
-        .attr("y", 110)      // 150 - height/2 to center
+        .attr("y", 115)      // 150 - height/2 to center
         .attr("width", 40)   // Similar scale to the circle (diameter)
-        .attr("height", 80)  // Making it square
+        .attr("height", 70)  // Making it square
         .attr("rx", 20)    // Horizontal corner radius
         .attr("ry", 20)
         .style("fill", "#BCC6CC")  // Metallic silver fill
-        .style("stroke", "#808080") // Darker silver stroke
-        .style("stroke-width", "2px")
-        .style("fill-opacity", 0.1)
+        .style("stroke", "#9BA4AA") // Darker silver stroke
+        .attr("stroke-width", 2)
+        .style("fill-opacity", 0.15)
         .style("filter", "url(#glow)");
 
     // Add horizontal lines inside rectangle
@@ -544,16 +566,104 @@ function VehicleBodyTypeWheel(){
 
     // Create arrows
     const arrowUp = group.append("path")
-        .attr("d", "M150,80 L130,100 L170,100 Z")
+        .attr("d", "M150,90 L130,110 L170,110 Z")
         .attr("fill", "#333")
         .style("opacity", 0.7)
         .style("cursor", "pointer");
 
     const arrowDown = group.append("path")
-        .attr("d", "M150,220 L130,200 L170,200 Z")
+        .attr("d", "M150,210 L130,190 L170,190 Z")
         .attr("fill", "#333")
         .style("opacity", 0.7)
         .style("cursor", "pointer");
+
+    // Create arc generator for curved buttons
+    const buttonArc = d3.arc()
+        .innerRadius(150)
+        .outerRadius(175)
+        .startAngle(-Math.PI/14)
+        .endAngle(Math.PI/14);
+
+    function toggleSpiderWeb(){
+
+        const buttonId = d3.select(this).attr("id");
+        
+        // You can perform different actions based on which button was clicked
+        if (buttonId === 'toggleCountButton') {
+            if(!d3.select('.radarArea_0').empty()){
+                d3.select('.radarArea_0')
+                    // .exit()
+                    // .transition()
+                    // .duration(1000)
+                    // .ease(d3.easeQuadIn)
+                    // .attr('transform', `translate(${cfg.w/2},${cfg.h/2}) scale(0.1)`)
+                    // .style("opacity", 0)
+                    .remove();
+                d3.selectAll('.radarCircle_count').remove();
+                showCountWeb = false;
+
+            }else{
+                showCountWeb = true;
+                updateSpiderChart();
+            }
+            
+        } else if (buttonId === "toggleInjuryButton") {
+            if(!d3.select('.radarArea_1').empty()){
+                d3.select('.radarArea_1').remove();
+                d3.selectAll('.radarCircle_injury').remove();
+                showInjuryWeb = false;
+            }else{
+                showInjuryWeb = true;
+                updateSpiderChart();
+            }
+        }
+    }
+
+    // Add button at II position (30 degrees)
+    svg.append("path")
+        .attr('id', 'toggleCountButton')
+        .attr("d", buttonArc)
+        .attr("transform", `translate(117, -70) rotate(60)`)
+        .style("fill", "#1E90FF")  // Metallic silver fill
+        .style("stroke", "#1E90FF") // Darker silver stroke
+        .attr("stroke-width", 2)
+        .style("fill-opacity", 0.15)
+        .style("filter", "url(#glow)")
+        .attr("class", "button")
+        .style("cursor", "pointer")
+        .on('click', toggleSpiderWeb)
+        .lower();
+
+    svg.append('text')
+        .text('Toggle No. of Accidents')
+        .attr('fill', 'white')
+        .attr('x', 280)
+        .attr('y', -160)
+        .style("font-size", "14px")
+        .style('font-weight', 'bold');
+
+    // Add button at IV position (120 degrees)
+    svg.append("path")
+        .attr('id', 'toggleInjuryButton')
+        .attr("d", buttonArc)
+        .attr("transform", `translate(119, 67) rotate(120)`)
+        .style("fill", "#FF8C00")  // Metallic silver fill
+        .style("stroke", "#FF8C00") // Darker silver stroke
+        .attr("stroke-width", 2)
+        .style("fill-opacity", 0.15)
+        .style("filter", "url(#glow)")
+        .attr("class", "button")
+        .style("cursor", "pointer")
+        .on('click', toggleSpiderWeb)
+        .lower();
+
+    svg.append('text')
+        .text('Toggle Injury Severity')
+        .attr('fill', 'white')
+        .attr('x', 280)
+        .attr('y', 170)
+        .style("font-size", "14px")
+        .style('font-weight', 'bold');
 
     // Create text elements
     group.selectAll(".option")
@@ -563,7 +673,7 @@ function VehicleBodyTypeWheel(){
         .attr("x", 190)
         .attr("y", (d, i) => 100 + i*50)
         .text(d => d)
-        .style("font-size", "16px")
+        .style("font-size", "12px")
         .attr('fill', 'white')
         .style("opacity", (d, i) => i === startIndex ? 1 : 0.3);
 
@@ -596,7 +706,7 @@ function VehicleBodyTypeWheel(){
         enter.merge(update)
             .transition()
             .duration(1000)
-            .attr("y", (d, i) => 100 + i*50)
+            .attr("y", (d, i) => 120 + i*30)
             .style("opacity", (d, i) => i === Math.floor(visibleCount / 2) ? 1 : 0.3);
 
         selectedVehicleBodyType = visibleOptions[Math.floor(visibleOptions.length / 2)];
