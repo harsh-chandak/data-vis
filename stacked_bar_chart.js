@@ -16,6 +16,18 @@ document.addEventListener('DOMContentLoaded', function () {
         light: row.light,
         driver_at_fault: String(row.driver_at_fault).trim().toLowerCase() === 'no' ? false : true
     })).then(data => {
+        const tooltip = d3.select("body")
+            .append("div")
+            .attr("class", "tooltip")
+            .style("position", "absolute")
+            .style("background", "rgba(0, 0, 0, 0.7)")
+            .style("color", "white")
+            .style("padding", "5px 10px")
+            .style("border-radius", "5px")
+            .style("pointer-events", "none")
+            .style("visibility", "hidden")
+            .style("font-size", "12px")
+
         const dataset_arr = data
         const at_fault_data = data.filter(row => row.driver_at_fault === true)
         const not_at_fault_data = data.filter(row => row.driver_at_fault === false)
@@ -168,14 +180,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const bars = layer.selectAll("rect")
 
-            bars.on("mouseover", function () {
+            bars.on("mouseover", function (event, d) {
                 d3.select(this).transition().duration(300).attr("opacity", 0.7)
-            })
-
-            bars.on("mouseleave", function () {
+                const group = d3.select(this.parentNode)
+                const weather_condition = d.data[0]
+                const light_condition = group.datum().key
+                const count = d[1] - d[0]
+                tooltip.style("visibility", "visible").html(`In the <strong>${String(light_condition).replace(/_/g, " ").split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}</strong> and <br> <strong>${String(weather_condition).replace(/_/g, " ").split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}</strong> weather<br>${count} Accidents took place`)
+            }).on("mousemove", function (event) {
+                tooltip.style("top", (event.pageY - 20) + "px")
+                    .style("left", (event.pageX + 20) + "px")
+            }).on("mouseleave", function () {
                 d3.select(this).transition().duration(300).attr("opacity", 1)
+                tooltip.style("visibility", "hidden")
             })
-
             bars.on("click", function (event, d) {
                 const group = d3.select(this.parentNode)
                 group.transition()
@@ -357,10 +375,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
             let obj = {}
             data.forEach(d => {
-                if (obj[d.surface_condition]) {
-                    obj[d.surface_condition]++
+                if (obj[String(d.surface_condition).trim().toUpperCase()]) {
+                    obj[String(d.surface_condition).trim().toUpperCase()]++
                 } else {
-                    obj[d.surface_condition] = 1
+                    obj[String(d.surface_condition).trim().toUpperCase()] = 1
                 }
             })
 
@@ -400,6 +418,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 .attr("fill", d => color_scale(d.data.name))
                 .attr("stroke", "white")
                 .attr("stroke-width", 1)
+                .on("mouseover", function (event, d) {
+                    const area = (d.x1 - d.x0) * (d.y1 - d.y0)
+                    tooltip.style("visibility", "visible")
+                        .html(`<strong>${d.data.name}</strong> road conditions in <strong>${weather}</strong> weather during the <strong>${light}</strong><br><strong>${d.data.value}</strong> Accidents took place`)
+                })
+                .on("mousemove", function (event) {
+                    tooltip.style("top", (event.pageY - 20) + "px")
+                        .style("left", (event.pageX + 20) + "px")
+                })
+                .on("mouseleave", function () {
+                    tooltip.style("visibility", "hidden")
+                })
 
             const minArea = 500
 
@@ -415,6 +445,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .attr("fill", "white")
                 .attr("font-size", "8px")
                 .text(d => d.data.name)
+
         }
     })
 })

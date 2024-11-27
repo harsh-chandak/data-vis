@@ -26,28 +26,28 @@ svg {
     margin-bottom: 50px;
 }
 
-#heatmap-svg{
+#heatmap-svg {
     /*
         Add styles for your svg
     */
 }
 
-#car-clock-svg{
+#car-clock-svg {
     /*
         Add styles for your svg
     */
 }
 
-#geospatial-svg{
+#geospatial-svg {
     /*
         Add styles for your svg
     */
 }
 
-#splom-svg{
+#splom-svg {
     /*
         Add styles for your svg
-    */    
+    */
 }
 
 #stacked-bar-chart-svg {
@@ -83,6 +83,7 @@ svg {
     border-radius: 4px;
     font-size: 12px;
     pointer-events: none;
+    transition: visibility 0.2s, opacity 0.2s;
 }
 
 #tree-map {
