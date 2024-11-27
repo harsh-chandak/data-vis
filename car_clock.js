@@ -424,6 +424,8 @@ function plotRadarChartData(){
         .style("filter" , "url(#glow)")
         .style("pointer-events", "all")
         .on("mouseover", function(e,i) {
+            tooltip.style("opacity", 0);
+            tooltipText.html('');
             newX =  parseFloat(d3.select(this).attr('cx'))+ 10;
             newY =  parseFloat(d3.select(this).attr('cy')) - 45;
 
@@ -457,15 +459,15 @@ function plotRadarChartData(){
             tooltip.raise(); 
             tooltipText.raise(); 
 
+            tooltip.attr('x', newX)
+                .attr('y', newY)
+                .style('opacity', 1);
+
             tooltipText.html(tooltipHtml)
                 .attr('x', newX+10)
                 .attr('y', newY+20)
                 .style("opacity", 1);
-
-            tooltip.attr('x', newX)
-                .attr('y', newY)
-                .transition().duration(200)
-                .style('opacity', 1);
+            
         })
         .on("mouseout", function(e, i){
             tooltip.style("opacity", 0);
@@ -507,6 +509,8 @@ function plotRadarChartData(){
 
 }
 
+var scroll = true;
+
 function VehicleBodyTypeWheel(){
 
     // Initial data
@@ -532,10 +536,53 @@ function VehicleBodyTypeWheel(){
         .attr('x', 190)
         .attr('y', 75)
         .style("font-size", "14px")
-        .style('font-weight', 'bold');
+        .style('font-weight', 'bold')
+        .style("opacity", 0.8);
+
+    // Top curved lines
+    group.selectAll(".dividerTop")
+    .data([1, 2])
+    .enter()
+    .append("path")
+    .attr("class", "dividerTop")
+    .attr("d", d => {
+        const y = 115 + (d * 60/5);
+        const midX = (132 + 168) / 2;
+        const controlY = y - 5;
+        return `M132,${y} Q${midX},${controlY} 168,${y}`;
+    })
+    .attr("fill", "none")
+    .attr("stroke", "#808080")
+    .attr("stroke-width", 1);
+
+    // Middle straight line
+    group.append("line")
+    .attr("class", "dividerMid")
+    .attr("x1", 130)
+    .attr("x2", 170)
+    .attr("y1", 115 + (3 * 60/5))
+    .attr("y2", 115 + (3 * 60/5))
+    .attr("stroke", "#808080")
+    .attr("stroke-width", 1);
+
+    // Bottom curved lines
+    group.selectAll(".dividerBottom")
+    .data([4, 5])
+    .enter()
+    .append("path")
+    .attr("class", "dividerBottom")
+    .attr("d", d => {
+        const y = 115 + (d * 60/5);
+        const midX = (132 + 168) / 2;
+        const controlY = y + 5;
+        return `M132,${y} Q${midX},${controlY} 168,${y}`;
+    })
+    .attr("fill", "none")
+    .attr("stroke", "#808080")
+    .attr("stroke-width", 1);
 
     // Create circular wheel background
-    group.append("rect")
+    const watchWheel = group.append("rect")
         .attr("x", 130)      // 150 - width/2 to center
         .attr("y", 115)      // 150 - height/2 to center
         .attr("width", 40)   // Similar scale to the circle (diameter)
@@ -546,41 +593,16 @@ function VehicleBodyTypeWheel(){
         .style("stroke", "#9BA4AA") // Darker silver stroke
         .attr("stroke-width", 2)
         .style("fill-opacity", 0.15)
-        .style("filter", "url(#glow)");
-
-    // Add horizontal lines inside rectangle
-    group.selectAll(".divider")
-        .data([1, 2, 3])  // For two lines dividing into three sections
-        .enter()
-        .append("line")
-        .attr("class", "divider")
-        .attr("x1", 130)  // Start from left edge of rectangle
-        .attr("x2", 170)  // End at right edge of rectangle
-        .attr("y1", d => 110 + (d * 80/4))  // Divide height into 3 equal parts
-        .attr("y2", d => 110 + (d * 80/4))
-        .attr("stroke", "#808080")
-        .attr("stroke-width", 1);
-
-
-    // Create arrows
-    const arrowUp = group.append("path")
-        .attr("d", "M150,90 L130,110 L170,110 Z")
-        .attr("fill", "#333")
-        .style("opacity", 0.7)
-        .style("cursor", "pointer");
-
-    const arrowDown = group.append("path")
-        .attr("d", "M150,210 L130,190 L170,190 Z")
-        .attr("fill", "#333")
-        .style("opacity", 0.7)
-        .style("cursor", "pointer");
+        .style("filter", "url(#glow)")
+        .style('cursor', 'ns-resize');
 
     // Create arc generator for curved buttons
     const buttonArc = d3.arc()
         .innerRadius(150)
-        .outerRadius(175)
+        .outerRadius(170)
         .startAngle(-Math.PI/14)
-        .endAngle(Math.PI/14);
+        .endAngle(Math.PI/14)
+        .cornerRadius(7);
 
     function toggleSpiderWeb(){
 
@@ -600,8 +622,11 @@ function VehicleBodyTypeWheel(){
                 d3.selectAll('.radarCircle_count').remove();
                 showCountWeb = false;
 
+                d3.select(this).style("fill", "#BCC6CC");
+
             }else{
                 showCountWeb = true;
+                d3.select(this).style("fill", "#1E90FF");
                 updateSpiderChart();
             }
             
@@ -610,8 +635,10 @@ function VehicleBodyTypeWheel(){
                 d3.select('.radarArea_1').remove();
                 d3.selectAll('.radarCircle_injury').remove();
                 showInjuryWeb = false;
+                d3.select(this).style("fill", "#BCC6CC");
             }else{
                 showInjuryWeb = true;
+                d3.select(this).style("fill", "#FF8C00");
                 updateSpiderChart();
             }
         }
@@ -622,10 +649,10 @@ function VehicleBodyTypeWheel(){
         .attr('id', 'toggleCountButton')
         .attr("d", buttonArc)
         .attr("transform", `translate(117, -70) rotate(60)`)
-        .style("fill", "#1E90FF")  // Metallic silver fill
-        .style("stroke", "#1E90FF") // Darker silver stroke
+        .style("fill", "#1E90FF")  
+        .style("stroke", "#1E90FF") 
         .attr("stroke-width", 2)
-        .style("fill-opacity", 0.15)
+        .style("fill-opacity", 0.3)
         .style("filter", "url(#glow)")
         .attr("class", "button")
         .style("cursor", "pointer")
@@ -633,22 +660,23 @@ function VehicleBodyTypeWheel(){
         .lower();
 
     svg.append('text')
-        .text('Toggle No. of Accidents')
+        .text('No. of Accidents')
         .attr('fill', 'white')
         .attr('x', 280)
         .attr('y', -160)
         .style("font-size", "14px")
-        .style('font-weight', 'bold');
+        .style('font-weight', 'bold')
+        .style("opacity", 0.8);
 
     // Add button at IV position (120 degrees)
     svg.append("path")
         .attr('id', 'toggleInjuryButton')
         .attr("d", buttonArc)
         .attr("transform", `translate(119, 67) rotate(120)`)
-        .style("fill", "#FF8C00")  // Metallic silver fill
-        .style("stroke", "#FF8C00") // Darker silver stroke
+        .style("fill", "#FF8C00")
+        .style("stroke", "#FF8C00")
         .attr("stroke-width", 2)
-        .style("fill-opacity", 0.15)
+        .style("fill-opacity", 0.3)
         .style("filter", "url(#glow)")
         .attr("class", "button")
         .style("cursor", "pointer")
@@ -656,12 +684,13 @@ function VehicleBodyTypeWheel(){
         .lower();
 
     svg.append('text')
-        .text('Toggle Injury Severity')
+        .text('Injury Severity')
         .attr('fill', 'white')
         .attr('x', 280)
         .attr('y', 170)
         .style("font-size", "14px")
-        .style('font-weight', 'bold');
+        .style('font-weight', 'bold')
+        .style("opacity", 0.8);
 
     // Create text elements
     group.selectAll(".option")
@@ -673,78 +702,69 @@ function VehicleBodyTypeWheel(){
         .text(d => d)
         .style("font-size", "12px")
         .attr('fill', 'white')
-        .style("opacity", (d, i) => i === startIndex ? 1 : 0.3);
+        .style("opacity", (d, i) => i === startIndex ? 0.8 : 0.3);
 
     function updateVisibleOptions() {
         // Get current visible options
         const visibleOptions = options.slice(startIndex, startIndex + visibleCount);
 
         // Bind data to the selection
-        const texts = group.selectAll(".option").data(visibleOptions);
+        const texts = group.selectAll(".option").data(visibleOptions, d => d);
 
         // Handle exit (remove elements not in the data)
-        texts.exit()
-        .remove();
+        texts.exit().remove();
 
         // Handle enter (create new elements for new data)
         const enter = texts.enter()
             .append("text")
             .attr("class", "option")
             .attr("x", 190)
+            .attr("y", (d, i) => 120 + i * 30) // Initial position for new elements
             .style("opacity", 0)
             .text(d => d)
-            .style("font-size", "16px");
+            .style("font-size", "12px")
+            .attr("fill", "white");
 
         // Handle update (modify existing elements)
         const update = texts
-            .attr("x", 190) // Update attributes (optional, ensures consistency)
-            .text(d => d); // Update text for existing elements
+            .attr("x", 190)
+            .text(d => d);
 
         // Merge enter and update for transitions
         enter.merge(update)
             .transition()
-            .duration(1000)
-            .attr("y", (d, i) => 120 + i*30)
-            .style("opacity", (d, i) => i === Math.floor(visibleCount / 2) ? 1 : 0.3);
+            .duration(500)
+            .attr("y", (d, i) => 120 + i * 30) // Set the position for visible options
+            .style("opacity", (d, i) => i === Math.floor(visibleCount / 2) ? 0.8 : 0.3);
 
+        // Update the selected value based on the middle visible option
         selectedVehicleBodyType = visibleOptions[Math.floor(visibleOptions.length / 2)];
     }
 
-    // Arrow click handlers
-    function moveDown() {
-        startIndex = Math.max(0, startIndex - 1);
+    // Scroll handler
+    function scrollOptions(event) {
+        event.preventDefault(); // Prevent default scroll behavior
+        if(!scroll){
+            return;
+        }
+        scroll = false;
+        if (event.deltaY > 0) {
+            // Scroll down
+            startIndex = Math.min(options.length - visibleCount, startIndex + 1);
+        } else if (event.deltaY < 0) {
+            // Scroll up
+            startIndex = Math.max(0, startIndex - 1);
+        }
         updateVisibleOptions();
         updateSpiderChart();
+        setTimeout(() => scroll = true, 1000);
     }
 
-    function moveUp() {
-        startIndex = Math.min(options.length - visibleCount, startIndex + 1);
-        updateVisibleOptions();
-        updateSpiderChart();
-    }
-
-    // Add click events to arrows
-    arrowUp.on("click", moveUp);
-    arrowDown.on("click", moveDown);
-
-    // Add hover effects
-    arrowUp.on("mouseover", function() {
-        d3.select(this).transition().duration(200).attr("fill", "#666");
-    })
-    .on("mouseout", function() {
-        d3.select(this).transition().duration(200).attr("fill", "#333");
-    });
-
-    arrowDown.on("mouseover", function() {
-        d3.select(this).transition().duration(200).attr("fill", "#666");
-    })
-    .on("mouseout", function() {
-        d3.select(this).transition().duration(200).attr("fill", "#333");
-    });
+    // Add mousewheel scroll event to the group
+    watchWheel.on("wheel", scrollOptions);
 
     // Initial render
-    updateVisibleOptions();
-
+    updateVisibleOptions();    
 }
 
 function updateSpiderChart(){
