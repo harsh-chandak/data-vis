@@ -391,7 +391,6 @@ function plotRadarChartData(){
                 .transition().duration(200)
                 .style("fill-opacity", cfg.opacityArea);
         })
-        .attr("d", d => radarLine(d.map(() => ({x: 0, y: 0}))))
         .transition()
         .duration(1000)
         .attr("d", (d, i) => radarLine(d));	
@@ -400,7 +399,6 @@ function plotRadarChartData(){
         .transition()
         .duration(1000)
         .ease(d3.easeQuadIn)
-        .attr("d", d => radarLine(d.map(() => ({x: 0, y: 0}))))
         .style("opacity", 0)
         .remove();
 
