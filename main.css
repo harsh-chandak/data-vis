@@ -43,7 +43,7 @@ svg {
 #geospatial-svg{
     width: 100%;       
     height: 730px;     
-    border: 1px solid #ccc; 
+    border: none;
     background-color: #000000;
 }
 
