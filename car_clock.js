@@ -38,23 +38,23 @@ const directions = new Map([
 ]);
 const injurySeverityMap = new Map([
     ['fatal', {value:6, label: 'Fatal Injury'}],
-    ['serious', {value:5, label: 'Serious Injury'}], 
-    ['minor', {value:4, label: 'Minor Injury'}], 
-    ['possible', {value:3, label: 'Possible Injury'}], 
-    ['no', {value:2, label: 'No Injury'}], 
-    ['unknown', {value:1, label: 'Unknown Injury'}] 
+    ['serious', {value:5, label: 'Serious Injury'}],
+    ['minor', {value:4, label: 'Minor Injury'}]
 ]);
 
 $(document).ready(() => {
 
     d3.csv('final.csv', d => {
         let obj = null;
-        for (const key in d) {
-            if((key === INJURY_SEVERITY || key === VEHICLE_FIRST_IMPACT_LOCATION || key === VEHICLE_BODY_TYPE) && Object.prototype.hasOwnProperty.call(d, key) && d[key]){
-                if(obj == null){
-                    obj = {};
+        if(d[INJURY_SEVERITY] === 'Fatal Injury' || d[INJURY_SEVERITY] === 'Suspected Serious Injury' || d[INJURY_SEVERITY] === 'Suspected Minor Injury'){
+            for (const key in d) {
+                if((key === INJURY_SEVERITY || key === VEHICLE_FIRST_IMPACT_LOCATION || key === VEHICLE_BODY_TYPE) && Object.prototype.hasOwnProperty.call(d, key) && d[key]){
+                    
+                    if(obj == null){
+                        obj = {};
+                    }
+                    obj[key] = d[key];
                 }
-                obj[key] = d[key];
             }
         }
         return obj;
@@ -220,7 +220,7 @@ function RadarChart() {
 	//If the supplied maxValue is smaller than the actual one, replace by the max in the data
 	var maxValue = Math.max(cfg.maxValue, d3.max(spiderData, function(i){return d3.max(i.map(function(o){return o.value;}))}))+1;
 		
-	var allAxis = (spiderData[0].map(function(i, j){return i.axis})),	//Names of each axis
+	var allAxis = Array.from(directions.keys()),	//Names of each axis
 		total = allAxis.length,					//The number of different axes
 		radius = Math.min(cfg.w/2, cfg.h/2); 	//Radius of the outermost circle
     angleSlice = Math.PI * 2 / total;		//The width in radians of each "slice"
@@ -441,20 +441,14 @@ function plotRadarChartData(){
                 tooltipHtml = '<tspan style="font-weight:bold;">No. of Accidents:</tspan> '+noOfAccidentsMap.get(i.axis);
             }else{
                 tooltip.attr("width", 150)
-                    .attr("height", 160)
+                    .attr("height", 120)
                     .attr("rx", 10)      // Rounded corners
                     .attr("ry", 10);
                 tooltipHtml = `<tspan style="font-weight:bold;">Injury Severity Level</tspan> <tspan x="${newX+10}" dy="1.5em" style="font-weight:bold;">and No. of Accidents:</tspan>`;
                 let sortedArr = Object.entries(locationInjuryCountMap.get(i.axis)).sort((a,b) => a[1]-b[1]);
-                let sum = 0;
-                let count = 0;
                 sortedArr.forEach(element => {
-                    sum += element[1]*injurySeverityMap.get(element[0]).value;
-                    count += element[1];
-                    tooltipHtml += `<tspan x="${newX+10}" dy="1.5em">${injurySeverityMap.get(element[0]).label} (${injurySeverityMap.get(element[0]).value}): ${element[1]}</tspan>`;
+                    tooltipHtml += `<tspan x="${newX+10}" dy="1.5em">${injurySeverityMap.get(element[0]).label}: ${element[1]}</tspan>`;
                 });
-                let wavg = Number((sum/count).toFixed(2));
-                tooltipHtml += `<tspan style="font-weight:bold;" x="${newX+10}" dy="1.5em">Severity Average: ${wavg}</tspan>`;
             }
 
             tooltip.raise(); 
