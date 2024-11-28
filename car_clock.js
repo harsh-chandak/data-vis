@@ -4,6 +4,7 @@
     2. transitions -- pending for webs
     3. legend -- done
     4. images
+    5. group vehicles
 */
 
 var spiderData = [];
