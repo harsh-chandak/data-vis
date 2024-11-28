@@ -188,13 +188,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const { final_data, year_group, country_group } = data;
 
         const colorMapping = {
-            "None": "#9467bd",
-            "Minor": "#1f77b4",  // Blue
-            "Moderate": "#ff7f0e",  // Orange
-            "Serious": "#2ca02c"  // Green
-            
+            "None": "#9467bd",       // Purple
+            "Minor": "#98df8a",      // Light Green
+            "Moderate": "#ffdd57",   // Yellow
+            "Serious": "#d62728"     // Red
         };
-        
+
 
         // Scales for positioning
         const xScale = d3.scaleBand()
@@ -263,52 +262,54 @@ document.addEventListener('DOMContentLoaded', function () {
                     .data(pie)
                     .enter().append("path")
                     .attr("d", arc)
-                    .attr("fill", (d, i) => d3.schemeCategory10[i % 10])
+                    .attr("fill", d => colorMapping[d.data.injury])  // Use the mapping
                     .attr("stroke", "white")
                     .attr("stroke-width", 1);
 
-                
+
+
                 paths.on("mouseover", function (event, d) {
                     d3.select(this)
                         .attr("stroke", "yellow")
                         .attr("stroke-width", 3);
 
-                    
+
                     const overlayPie = d3.select("#overlay-pie");
 
-                    
+
                     overlayPie.selectAll("path").remove();
                     overlayPie.selectAll("text").remove();
 
-                    
+
                     const overlayWidth = +overlayPie.attr("width");
                     const overlayHeight = +overlayPie.attr("height");
                     const centerX = overlayWidth / 2;
                     const centerY = overlayHeight / 2;
 
-                    
+
                     const enlargedArc = d3.arc()
                         .innerRadius(0)
-                        .outerRadius(Math.min(overlayWidth, overlayHeight) / 2 - 20); 
+                        .outerRadius(Math.min(overlayWidth, overlayHeight) / 2 - 20);
 
-                    
+
                     const total = pie.reduce((sum, p) => sum + p.data.count, 0);
 
-                
+
                     overlayPie.selectAll("path")
                         .data(pie)
                         .enter().append("path")
                         .attr("d", enlargedArc)
-                        .attr("fill", (d, i) => d3.schemeCategory10[i % 10])
+                        .attr("fill", d => colorMapping[d.data.injury])  // Use the mapping
                         .attr("stroke", "white")
                         .attr("stroke-width", 2)
-                        .attr("transform", `translate(${centerX}, ${centerY})`); 
+                        .attr("transform", `translate(${centerX}, ${centerY})`);
+
 
                     overlayPie.selectAll("text")
                         .data(pie)
                         .enter().append("text")
                         .attr("transform", d => {
-                            
+
                             const [x, y] = enlargedArc.centroid(d);
                             const scaleFactor = 1.5;
                             return `translate(${x * scaleFactor + centerX}, ${y * scaleFactor + centerY})`;
@@ -318,7 +319,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         .attr("font-size", "14px")
                         .text(d => {
                             const percentage = Math.round((d.data.count / total) * 100);
-                            return percentage > 0 ? `${percentage}%` : ""; 
+                            return percentage > 0 ? `${percentage}%` : "";
                         });
 
 
@@ -350,7 +351,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .attr("y", i * 20)
                 .attr("width", 15)
                 .attr("height", 15)
-                .attr("fill", d3.schemeCategory10[i % 10]);
+                .attr("fill", colorMapping[severity]);  // Use the mapping
 
             legend.append("text")
                 .attr("x", 20)
@@ -358,6 +359,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .attr("fill", "white")
                 .text(severity);
         });
+
     }
 
 
