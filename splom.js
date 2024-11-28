@@ -184,46 +184,49 @@ document.addEventListener('DOMContentLoaded', function () {
     function createPieChartMatrix(data) {
         const pieWidth = 80, pieHeight = 80;
         const margin = { top: 20, right: 20, bottom: 20, left: 120 };
-    
+
         const { final_data, year_group, country_group } = data;
-    
+
         const colorMapping = {
             "None": "#d3d3d3",       // Purple
             "Minor": "#98df8a",      // Light Green
             "Moderate": "#ffdd57",   // Yellow
             "Serious": "#d62728"     // Red
         };
-    
+
         // Scales for positioning
         const xScale = d3.scaleBand()
             .domain(year_group)
             .range([margin.left, svgWidth - margin.right])
             .padding(0.1);
-    
+
         const yScale = d3.scaleBand()
             .domain(country_group)
             .range([margin.top, svgHeight - margin.bottom])
             .padding(0.1);
-    
+
         // Axes
         const xAxis = d3.axisBottom(xScale).tickSize(0);
         const yAxis = d3.axisLeft(yScale).tickSize(0);
-    
+
         // Append axes
         svg.append("g")
             .attr("transform", `translate(0,${svgHeight - margin.bottom})`)
             .call(xAxis)
             .selectAll("text")
             .attr("fill", "white")
-            .style("font-size", "20px");
-    
+            .style("font-size", "20px")
+            .attr("transform", "translate(-100, 10)"); // Adjust this to move the labels left
+
+
         svg.append("g")
             .attr("transform", `translate(${margin.left},0)`)
             .call(yAxis)
             .selectAll("text")
             .attr("fill", "white")
-            .style("font-size", "20px");
-    
+            .style("font-size", "20px")
+            
+
         // Create an overlay for the enlarged chart
         const overlay = d3.select("body").append("div")
             .attr("id", "overlay")
@@ -235,33 +238,33 @@ document.addEventListener('DOMContentLoaded', function () {
             .style("width", "400px")  // Set the width of the overlay
             .style("height", "400px") // Set the height of the overlay
             .style("z-index", 10);
-    
+
         overlay.append("svg")
             .attr("width", 320)
             .attr("height", 320)
             .attr("id", "overlay-pie");
-    
+
         // Create pie charts
         year_group.forEach(year => {
             country_group.forEach(country => {
                 const groupData = final_data.filter(d => d.make_year === year && d.car_country === country);
-        
+
                 const injurySeverityCount = d3.rollup(groupData, v => v.length, d => d.injury_severity);
                 const pieData = Array.from(injurySeverityCount, ([injury, count]) => ({ injury, count }))
                     .filter(d => d.count > 0); // Remove slices with count = 0
-        
+
                 const pie = d3.pie().value(d => d.count)(pieData); // Pie chart calculation with integer values
                 const arc = d3.arc().innerRadius(0).outerRadius(pieWidth / 2);
-        
+
                 const pieGroup = svg.append("g")
-                    .attr("transform", `translate(${xScale(year) + xScale.bandwidth() / 2}, ${yScale(country) + yScale.bandwidth() / 2})`);
-        
+                    .attr("transform", `translate(${xScale(year) + xScale.bandwidth() / 10}, ${yScale(country) + yScale.bandwidth() / 2})`);
+
                 // Calculate if there's any serious accident with a percentage greater than 0
                 const seriousAccident = pieData.some(d => {
                     const percentage = (d.count / d3.sum(pieData, d => d.count)) * 100;
                     return d.injury === "Serious" && parseFloat(percentage.toFixed(2)) > 0;
                 });
-        
+
                 // Only add the red circle if there are serious accidents
                 if (seriousAccident) {
                     pieGroup.append("circle")
@@ -270,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         .attr("stroke", "#800000")
                         .attr("stroke-width", 12);
                 }
-        
+
                 // Draw pie slices with integer values
                 const paths = pieGroup.selectAll("path")
                     .data(pie)
@@ -279,30 +282,30 @@ document.addEventListener('DOMContentLoaded', function () {
                     .attr("fill", d => colorMapping[d.data.injury])  // Use the mapping
                     .attr("stroke", "white")
                     .attr("stroke-width", 1);
-        
+
                 // Hover interaction for highlighting
                 paths.on("mouseover", function (event, d) {
                     d3.select(this)
                         .attr("stroke", "yellow")
                         .attr("stroke-width", 3);
-        
+
                     const overlayPie = d3.select("#overlay-pie");
-        
+
                     overlayPie.selectAll("path").remove();
                     overlayPie.selectAll("text").remove();
                     d3.select("#overlay").selectAll(".overlay-text").remove();
-        
+
                     const overlayWidth = +overlayPie.attr("width");
                     const overlayHeight = +overlayPie.attr("height");
                     const centerX = overlayWidth / 2;
                     const centerY = overlayHeight / 2;
-        
+
                     const enlargedArc = d3.arc()
                         .innerRadius(0)
                         .outerRadius(Math.min(overlayWidth, overlayHeight) / 2 - 20);
-        
+
                     const total = pie.reduce((sum, p) => sum + p.data.count, 0);
-        
+
                     overlayPie.selectAll("path")
                         .data(pie)
                         .enter().append("path")
@@ -311,8 +314,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         .attr("stroke", "white")
                         .attr("stroke-width", 2)
                         .attr("transform", `translate(${centerX}, ${centerY})`);
-        
-                        overlayPie.selectAll("text")
+
+                    overlayPie.selectAll("text")
                         .data(pie)
                         .enter().append("text")
                         .attr("transform", d => {
@@ -328,8 +331,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             // Only display text if the percentage is greater than 0
                             return percentage > 0 ? `${percentage}%` : "";
                         });
-                    
-        
+
+
                     const textContainer = d3.select("#overlay")
                         .append("div")
                         .attr("class", "overlay-text")
@@ -341,14 +344,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         .style("line-height", "1.5")
                         .style("width", "360px") // Ensure text fits within the overlay width
                         .style("text-align", "left"); // Align the text
-        
+
                     // Add category text dynamically
                     pie.forEach(p => {
                         const percentage = ((p.data.count / total) * 100).toFixed(2);
                         textContainer.append("div")
                             .text(`${p.data.injury}: ${percentage}% (${p.data.count} accidents)`);
                     });
-        
+
                     overlay
                         .style("display", "block")
                         .style("left", `${event.pageX + 10}px`)
@@ -357,18 +360,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     d3.select(this)
                         .attr("stroke", "white")
                         .attr("stroke-width", 1);
-        
+
                     overlay.style("display", "none");
                 });
             });
         });
-     
-    
+
+
         // Draw legend
         const legendData = [...new Set(final_data.map(d => d.injury_severity))];
         const legend = svg.append("g")
-            .attr("transform", `translate(${svgWidth - margin.right - 20}, ${margin.top})`);
-    
+            .attr("transform", `translate(${svgWidth - margin.right - 90}, ${margin.top})`);
+
         // Add the label "Severity of accidents" above the legend
         legend.append("text")
             .attr("x", 0)
@@ -376,8 +379,8 @@ document.addEventListener('DOMContentLoaded', function () {
             .attr("fill", "white")
             .attr("font-size", "16px")
             .attr("font-weight", "bold")
-            .text("Severity of accidents");
-    
+            .text("Severity");
+
         // Add the legend rectangles and text
         legendData.forEach((severity, i) => {
             legend.append("rect")
@@ -386,7 +389,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .attr("width", 15)
                 .attr("height", 15)
                 .attr("fill", colorMapping[severity]);
-    
+
             legend.append("text")
                 .attr("x", 20)
                 .attr("y", i * 20 + 22)  // Adjust position to align with the rectangle
@@ -394,7 +397,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .text(severity);
         });
     }
-    
+
 
 
 });
