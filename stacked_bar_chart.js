@@ -151,14 +151,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 .call(d3.axisBottom(x_scale))
                 .style("opacity", 0)
                 .transition()
-                .duration(1000)
+                .duration(500)
                 .style("opacity", 1)
 
             chart_group.append("g")
                 .call(d3.axisLeft(y_scale))
                 .style("opacity", 0)
                 .transition()
-                .duration(1000)
+                .duration(500)
                 .style("opacity", 1)
 
             const layer = chart_group.selectAll(".layer")
@@ -173,13 +173,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 .attr("width", x_scale.bandwidth())
                 .attr("y", height)
                 .attr("height", 0)
+                .style("pointer-events", "none")
                 .transition()
-                .duration(1000)
+                .duration(500)
                 .attr("y", d => y_scale(d[1]))
                 .attr("height", d => y_scale(d[0]) - y_scale(d[1]))
+                .on("end", function () {
+                    d3.select(this).style("pointer-events", "auto");
+                })
 
             const bars = layer.selectAll("rect")
-
             bars.on("mouseover", function (event, d) {
                 d3.select(this).transition().duration(300).attr("opacity", 0.7)
                 const group = d3.select(this.parentNode)
