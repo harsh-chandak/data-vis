@@ -1,0 +1,57 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #000000;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    color: #ffffff;
+}
+
+.container {
+    border: 1px solid white;
+    background-color: black;
+    position: relative;
+    width: 80%;
+    height: 800px;
+    margin-bottom: 50px;
+}
+
+svg {
+    position: relative;
+    width: 100%;
+    height: 800px;
+    margin-bottom: 50px;
+}
+
+#heatmap-svg{
+    /*
+        Add styles for your svg
+    */
+}
+
+#car-clock-svg{
+    /*
+        Add styles for your svg
+    */
+}
+
+#geospatial-svg{
+    /*
+        Add styles for your svg
+    */
+}
+
+#splom-svg{
+    /*
+        Add styles for your svg
+    */    
+}
+
+#stacked-bar-chart-svg{
+    /*
+        Add styles for your svg
+    */    
+}
