@@ -4,13 +4,13 @@
     2. transitions -- pending for webs
     3. legend -- done
     4. images
-    5. group vehicles
+    5. group vehicles -- done
 */
 
 var spiderData = [];
 var locationInjuryCountMap = new Map(); //to show on hover 
 var noOfAccidentsMap = new Map(); //to show on hover 
-var selectedVehicleBodyType = "ALL";
+var selectedVehicleGroup = "All";
 var parsedData;
 var radarLine; 
 var cfg;
@@ -23,6 +23,29 @@ var showInjuryWeb = true;
 const INJURY_SEVERITY = 'injury_severity';
 const VEHICLE_FIRST_IMPACT_LOCATION = 'vehicle_first_impact_location';
 const VEHICLE_BODY_TYPE = 'vehicle_body_type';
+const VEHICLE_GROUP = 'vehicle_group';
+const commonVehicleGroups = new Map([
+    ['bus', {
+        label: 'Bus',
+        types: ['Bus - Transit']
+    }],
+    ['motorcycle', {
+        label: 'Motorcycle',
+        types: ['Moped Or motorized bicycle', 'Motorcycle - 2 Wheeled', 'Motorcycle - 3 Wheeled']
+    }],
+    ['truck', {
+        label: 'Truck',
+        types: ['Other Trucks', 'Pickup', 'Single-Unit Truck']
+    }],
+    ['sport', {
+        label: 'Sport Vehicle',
+        types: ['All-Terrain Vehicle/All-Terrain Cycle (ATV/ATC)', 'Snowmobile', 'Sport Utility Vehicle']
+    }],
+    ['passenger', {
+        label: 'Passenger Vehicle',
+        types: ['Station Wagon', 'Van - Passenger (&lt;9 Seats)', 'Passenger Car']
+    }],
+]);
 const directions = new Map([
     ['twelve', 'XII'], 
     ['one', 'I'], 
@@ -55,6 +78,19 @@ $(document).ready(() => {
                         obj = {};
                     }
                     obj[key] = d[key];
+
+                    if(key === VEHICLE_BODY_TYPE){
+                        let vehicleGroup = d[key];
+                        outerLoop: for (const [k, v] of commonVehicleGroups) {
+                            for (const vehicleType of v.types) {
+                                if (vehicleType === d[key]) {
+                                    vehicleGroup = k;
+                                    break outerLoop; 
+                                }
+                            }
+                        }  
+                        obj[VEHICLE_GROUP] = vehicleGroup;                      
+                    }
                 }
             }
         }
@@ -81,7 +117,7 @@ function filterData(){
 
     parsedData.forEach(d => {
         
-        if(d[VEHICLE_FIRST_IMPACT_LOCATION] && (selectedVehicleBodyType === 'ALL' || d[VEHICLE_BODY_TYPE] === selectedVehicleBodyType)){
+        if(d[VEHICLE_FIRST_IMPACT_LOCATION] && (selectedVehicleGroup === 'All' || d[VEHICLE_GROUP] === selectedVehicleGroup)){
 
             let axis = d[VEHICLE_FIRST_IMPACT_LOCATION].split(' ')[0].toLowerCase();
             if(directions.has(axis)){
@@ -512,8 +548,8 @@ function VehicleBodyTypeWheel(){
     // Initial data
     const options = [];
     options.push(' ');
-    options.push('ALL');
-    let sortedArr = [...new Set(parsedData.map(d => d[VEHICLE_BODY_TYPE]))].sort();
+    options.push('All');
+    let sortedArr = [...new Set(parsedData.map(d => d[VEHICLE_GROUP]))].sort();
     options.push(...sortedArr);
     options.push(' ');
     let startIndex = 0;  // Starting index of the visible window
@@ -695,7 +731,7 @@ function VehicleBodyTypeWheel(){
         .attr("class", "option")
         .attr("x", 190)
         .attr("y", (d, i) => 100 + i*50)
-        .text(d => d)
+        .text(d => commonVehicleGroups.get(d) ? commonVehicleGroups.get(d).label : d)
         .style("font-size", "12px")
         .attr('fill', 'white')
         .style("opacity", (d, i) => i === startIndex ? 0.8 : 0.3);
@@ -717,14 +753,14 @@ function VehicleBodyTypeWheel(){
             .attr("x", 190)
             .attr("y", (d, i) => 120 + i * 30) // Initial position for new elements
             .style("opacity", 0)
-            .text(d => d)
+            .text(d => commonVehicleGroups.get(d) ? commonVehicleGroups.get(d).label : d)
             .style("font-size", "12px")
             .attr("fill", "white");
 
         // Handle update (modify existing elements)
         const update = texts
             .attr("x", 190)
-            .text(d => d);
+            .text(d => commonVehicleGroups.get(d) ? commonVehicleGroups.get(d).label : d);
 
         // Merge enter and update for transitions
         enter.merge(update)
@@ -734,7 +770,7 @@ function VehicleBodyTypeWheel(){
             .style("opacity", (d, i) => i === Math.floor(visibleCount / 2) ? 0.8 : 0.3);
 
         // Update the selected value based on the middle visible option
-        selectedVehicleBodyType = visibleOptions[Math.floor(visibleOptions.length / 2)];
+        selectedVehicleGroup = visibleOptions[Math.floor(visibleOptions.length / 2)];
     }
 
     // Scroll handler
