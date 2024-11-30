@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function createPieChartMatrix(data) {
-        const svgWidth = 1000, svgHeight = 600;  // Total SVG size
+        const svgWidth = 900, svgHeight = 600;  // Total SVG size
     const pieWidth = 60, pieHeight = 50;  // Size of each pie chart
     const margin = { top: 50, right: 50, bottom: 40, left: 120 };
     
