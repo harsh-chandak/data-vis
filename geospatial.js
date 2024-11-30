@@ -10,9 +10,9 @@ document.addEventListener('DOMContentLoaded', function () {
                       .attr("width", width)
                       .attr("height", height)
                       .style("display", "block")
-                      .style("margin", "0 auto");
+                      .style("padding", "100px 0px 0px 0px");
 
-        const projection = d3.geoAlbersUsa().fitSize([width, height], dataset); 
+        const projection = d3.geoAlbersUsa().fitSize([width+200, height], dataset); 
         const path = d3.geoPath().projection(projection);
 
         
