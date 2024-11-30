@@ -1,8 +1,9 @@
-let dataset;
-let width = 1000;
-let height = 700;
+
+    let dataset; 
 document.addEventListener('DOMContentLoaded', function () {    
 
+    let width = 1000;
+    let height = 700;
     d3.json("Zip_Code.geojson").then(function(dataset) {
 
         const svg = d3.select("#geospatial-svg")
@@ -511,5 +512,4 @@ document.addEventListener('DOMContentLoaded', function () {
         
     });
 });
-
 
