@@ -17,8 +17,6 @@ body {
     width: 80%;
     height: 1000px;
     margin-bottom: 50px;
-    justify-content: center; 
-    align-items: center;
 }
 
 svg {
@@ -53,9 +51,48 @@ svg {
     */
 }
 
-#stacked-bar-chart-svg{
-    /*
-        Add styles for your svg
-    */    
+#stacked-bar-chart-svg {
+    display: block;
+    margin: auto;
+    background: linear-gradient(135deg, #1e1e1e, #3a3a3a);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+}
+
+.axis path,
+.axis line {
+    stroke: white;
+}
+
+.column-header,
+.row-header {
+    font-size: 16px;
+    font-weight: bold;
+    fill: white;
+}
+
+.legend text {
+    font-size: 12px;
+    fill: white;
+}
+
+.tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    pointer-events: none;
+    transition: visibility 0.2s, opacity 0.2s;
+}
+
+#tree-map {
+    display: block;
+    margin: auto;
+    background: linear-gradient(135deg, #1e1e1e, #3a3a3a);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    height: 400px;
 }
 
