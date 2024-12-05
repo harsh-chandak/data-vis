@@ -1,8 +1,8 @@
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #2b2b2b;
+    background-color: rgb(10, 0, 0);
     margin: 0;
-    padding: 20px;
+    padding: 5px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -11,90 +11,80 @@ body {
 }
 
 .container {
-    border: 1px solid white;
-    background-color: black;
-    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     width: 80%;
-    height: 1000px;
+    height: 600px;
     margin-bottom: 50px;
 }
 
-svg {
-    position: relative;
-    width: 80%;
-    height: 800px;
-    margin-bottom: 50px;
+/* Default chart positioning (chart on left, text on right) */
+.chart-container {
+    width: 70%;  /* Adjust the width of the chart */
+    height: 100%;
 }
 
-#heatmap-svg {
-/*
-        Add styles for your svg
-    */
+.text-container {
+    width: 28%;  /* Adjust the width for the text */
+    padding: 10px;
 }
 
-#car-clock-svg {
-    width: 100%;       
-    height: 730px;     
-    border: none;
-    background-color: #000000;
+/* CSS to alternate layout */
+.container:nth-child(odd) .chart-container {
+    order: 1;
 }
 
-#geospatial-svg{
-    width: 100%;   
-    height: 730px;         
-    border: none;
-    background-color: #000000;
+.container:nth-child(odd) .text-container {
+    order: 2;
 }
 
-#splom-svg {
-    width: 100%;       
-    height: 730px;     
-    border: none;
-    background-color: #000000;
+.container:nth-child(even) .chart-container {
+    order: 2;
 }
 
-#stacked-bar-chart-svg {
-    display: block;
+.container:nth-child(even) .text-container {
+    order: 1;
+}
+
+/* Optional: Adjust chart size */
+#heatmap-svg,
+#car-clock-svg,
+#geospatial-svg,
+#splom-svg,
+#stacked-bar-chart-svg{
+    width: 100%;
+    height: 90%;
     margin: auto;
-    background: linear-gradient(135deg, #1e1e1e, #3a3a3a);
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
-    border-radius: 8px;
-}
-
-.axis path,
-.axis line {
-    stroke: white;
-}
-
-.column-header,
-.row-header {
-    font-size: 16px;
-    font-weight: bold;
-    fill: white;
-}
-
-.legend text {
-    font-size: 12px;
-    fill: white;
-}
-
-.tooltip {
-    position: absolute;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 12px;
-    pointer-events: none;
-    transition: visibility 0.2s, opacity 0.2s;
 }
 
 #tree-map {
-    display: block;
+    width: 100%;
+    height: 100%;
     margin: auto;
-    background: linear-gradient(135deg, #1e1e1e, #3a3a3a);
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
-    border-radius: 8px;
-    height: 400px;
+    align-items: center;
 }
 
+/* Adjust text styling */
+h3 {
+    font-size: 18px;
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+p {
+    color: #ccc;
+    font-size: 14px;
+}
+/* Initial state for text (hidden, before scrolling into view) */
+.text-container {
+    opacity: 0;
+    transform: translateY(50px);  /* Optional: makes the text start from below */
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+/* Visible state (when scrolled into view) */
+.text-container.visible {
+    opacity: 1;
+    transform: translateY(0);  /* Text moves to its original position */
+}

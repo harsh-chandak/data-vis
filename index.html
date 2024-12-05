@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="./main.css">
 </head>
 
-<body>
+<!-- <body>
     <h1 style="margin: 0%;">Mapping Accident Trends and Patterns in Maryland: A Data-Driven Story</h1>
     <p>Data Visualization Course Projects | Aman-Anirudh-Ashutosh-Harsh-Soumya</p>
     <div class="container" id="mosaic-controls">
@@ -20,7 +20,7 @@
             <select id="year-select-1"></select>
             <select id="year-select-2"></select>
         </div>
-        <svg id="heatmap-svg" width="900" height="600"></svg>
+        <svg id="heatmap-svg" width="100%" height="100%" viewBox="0 0 900 900" preserveAspectRatio="xMidYMid meet" ></svg>
 
         
     </div>
@@ -28,28 +28,140 @@
     
     <div class="container">
         <h3>Car in a Clock: Spider chart comparing the number of accidents and injury severity</h3>
-        <svg id="car-clock-svg"></svg>
+        <svg id="car-clock-svg" width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
     
     <div class="container">
         <h3>Geospatial map for locations and accident severity</h3>
-        <svg id="geospatial-svg"></svg>
+        <svg id="geospatial-svg" width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
     
     <div class="container">
         <h3>SPLOM chart for comparing accidents against car brands</h3>
-        <svg id="splom-svg"></svg>
+        <svg id="splom-svg" width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
     
-    <div class="container" style="padding:  50px 0 100px 0px; height: auto;" id="stack-container">
+    <div class="container" >
         <h3>Stacked bar chart matrix for Weather conditions and Light Conditions plotted against No of Accidents</h3>
-        <svg id="stacked-bar-chart-svg"></svg>
+        <svg id="stacked-bar-chart-svg" width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
     <script src="./mosaicmap.js"></script>
     <script src="./car_clock.js"></script>
     <script src="./geospatial.js"></script>
     <script src="./splom.js"></script>
     <script src="./stacked_bar_chart.js"></script>
+</body> -->
+
+<body>
+    <h1 style="margin: 0%;">Mapping Accident Trends and Patterns in Maryland: A Data-Driven Story</h1>
+    <p>Data Visualization Course Projects | Aman-Anirudh-Ashutosh-Harsh-Soumya</p>
+
+    <!-- Chart 1 (odd, should be left-right) -->
+    <div class="container">
+        <div class="chart-container">
+            <svg id="heatmap-svg" width="100%" height="100%" viewBox="0 0 900 900" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+        <div class="text-container">
+            <h3>Mosaic charts of accident severity vs light</h3>
+            <p>Explanation of this chart goes here...</p>
+        </div>
+    </div>
+
+    <!-- Chart 2 (even, should be right-left) -->
+    <div class="container">
+        <div class="chart-container">
+            <svg id="car-clock-svg" width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+        <div class="text-container">
+            <h3>Car in a Clock: Spider chart comparing the number of accidents and injury severity</h3>
+            <p>Explanation of this chart goes here...</p>
+        </div>
+    </div>
+
+    <!-- Chart 3 (odd, should be left-right) -->
+    <div class="container">
+        <div class="chart-container">
+            <svg id="geospatial-svg" width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+        <div class="text-container">
+            <h3>Geospatial map for locations and accident severity</h3>
+            <p>Explanation of this chart goes here...</p>
+        </div>
+    </div>
+
+    <!-- Chart 4 (even, should be right-left) -->
+    <div class="container">
+        <div class="chart-container">
+            <svg id="splom-svg" width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+        <div class="text-container">
+            <h3>SPLOM chart for comparing accidents against car brands</h3>
+            <p>Explanation of this chart goes here...</p>
+        </div>
+    </div>
+
+    <!-- Chart 5 (odd, sho uld be left-right) -->
+    <div class="container" >
+        <div class="chart-container">
+            <svg id="stacked-bar-chart-svg" width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+        <div class="text-container">
+            <h3>Stacked bar chart matrix for Weather conditions and Light Conditions plotted against No of Accidents</h3>
+            <p>Explanation of this chart goes here...</p>
+        </div>
+    </div>
+    <div class ="container">
+        <div class ="chart-container" id="stack-container">       
+        <svg id="tree-map" width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+    </div>
+
+    <script src="./mosaicmap.js"></script>
+    <script src="./car_clock.js"></script>
+    <script src="./geospatial.js"></script>
+    <script src="./splom.js"></script>
+    <script src="./stacked_bar_chart.js"></script>
+    <script>
+        let lastScrollTop = 0; // Keeps track of the last scroll position
+
+// Function to detect if an element is in the viewport
+function isInViewport(element) {
+    const rect = element.getBoundingClientRect();
+    return rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && rect.right <= (window.innerWidth || document.documentElement.clientWidth);
+}
+
+// Function to add the "visible" class to text containers when they are in the viewport
+function handleScroll() {
+    const textContainers = document.querySelectorAll('.text-container');
+    let currentScrollTop = window.scrollY || window.pageYOffset;
+
+    // If scrolling up (going back), start showing elements
+    if (currentScrollTop < lastScrollTop) {
+        textContainers.forEach(container => {
+            if (isInViewport(container)) {
+                container.classList.add('visible');
+            }
+        });
+    } else { 
+        // If scrolling down (normal scroll), continue hiding or revealing elements
+        textContainers.forEach(container => {
+            if (isInViewport(container)) {
+                container.classList.add('visible');
+            }
+        });
+    }
+
+    lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop; // Update the scroll position for next check
+}
+
+// Attach the scroll event to the window
+window.addEventListener('scroll', handleScroll);
+
+// Run the function on page load to check initial visibility (if elements are already in the viewport)
+handleScroll();
+
+    </script>
+    
 </body>
 
 </html>
