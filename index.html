@@ -11,17 +11,25 @@
     <link rel="stylesheet" href="./main.css">
 </head>
 
-<body>
-    <h1 style="margin: 0%;">Mapping Accident Trends and Patterns in Maryland: A Data-Driven Story</h1>
-    <p>Data Visualization Course Projects | Aman-Anirudh-Ashutosh-Harsh-Soumya</p>
 
+    <header>
+        <h1>Mapping Accident Trends and Patterns in Maryland: A Data-Driven Story</h1>
+        <p>Data Visualization Course Projects | Aman-Anirudh-Ashutosh-Harsh-Soumya</p>
+    </header>
+    <section id="introduction">
+        <h2>Introduction</h2>
+        <p>
+            The culmination of our data visualization project provides a comprehensive analysis of traffic accidents in Montgomery County, revealing critical insights into accident dynamics, environmental and behavioral influences, and vehicle-specific safety trends. By leveraging advanced visual analytics, we have successfully transformed a complex dataset into an actionable narrative that supports data-driven decision-making.
+        </p>
+    </section>
+    
     <div class="container">
         <div class="chart-container">
-            <svg id="heatmap-svg" width="100%" height="100%" viewBox="0 0 1400 500" preserveAspectRatio="xMidYMid meet"></svg>
+            <svg id="heatmap-svg" width="100%" height="100%" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMid meet"></svg>
         </div>
         <div class="text-container">
             <h3>Mosaic charts of accident severity vs light</h3>
-            <p>Explanation of this chart goes here...</p>
+            <p>The Mosaic Chart bridges light conditions and injury outcomes, identifying year-over-year trends for evaluating the effectiveness of safety measures.</p>
         </div>
     </div>
 
@@ -31,7 +39,7 @@
         </div>
         <div class="text-container">
             <h3>Car in a Clock: Spider chart comparing the number of accidents and injury severity</h3>
-            <p>Explanation of this chart goes here...</p>
+            <p>The Car-in-a-Clock visualization innovatively connects collision points and vehicle types with injury severities, enhancing interpretability of directional impact dynamics.</p>
         </div>
     </div>
 
@@ -41,7 +49,7 @@
         </div>
         <div class="text-container">
             <h3>Geospatial map for locations and accident severity</h3>
-            <p>Explanation of this chart goes here...</p>
+            <p>The Geo-Spatial Map effectively highlights accident hotspots, combining postal region severity with specific location clusters for a dual-layered understanding of spatial patterns.</p>
         </div>
     </div>
 
@@ -51,7 +59,7 @@
         </div>
         <div class="text-container">
             <h3>SPLOM chart for comparing accidents against car brands</h3>
-            <p>Explanation of this chart goes here...</p>
+            <p>The Pie Chart Matrix showcases the influence of car origin and manufacturing year on accident severity, providing a detailed assessment of vehicle safety evolution.</p>
         </div>
     </div>
 
@@ -61,7 +69,7 @@
         </div>
         <div class="text-container">
             <h3>Stacked bar chart matrix for Weather conditions and Light Conditions plotted against No of Accidents</h3>
-            <p>Explanation of this chart goes here...</p>
+            <p>Stacked Bar Charts and Treemaps delve into environmental factors, correlating conditions like light and weather with accident causation and severity.</p>
         </div>
     </div>
     <div class ="tree-container">
@@ -85,6 +93,7 @@
         
         function handleScroll() {
             const textContainers = document.querySelectorAll('.text-container');
+            const introcontainer = document.querySelectorAll('introduction');
             let currentScrollTop = window.scrollY || window.pageYOffset;
         
             if (currentScrollTop > lastScrollTop) {
@@ -111,8 +120,27 @@
         window.addEventListener('scroll', handleScroll);
         handleScroll();
         </script>
+        <footer>
+            <h3>Interactivity and User-Centric Design</h3>
+            <p>
+                Dropdowns, tooltips, and clickable features across visualizations enable granular exploration of the data, making the insights accessible to diverse stakeholders, from policymakers to the general public.
+            </p>
         
-    
+            <h3>Data-Driven Insights for Road Safety</h3>
+            <p>
+                • Spatial analysis pinpointed high-risk regions requiring infrastructure upgrades.
+                <br />
+                • Behavioral patterns and environmental conditions underscored the need for targeted interventions, such as enhanced driver education during adverse conditions and improved road maintenance.
+                <br />
+                • Vehicle-specific trends highlighted gaps in safety standards for older models, driving a call for stricter regulations and consumer awareness of modern safety features.
+            </p>
+        
+            <h3>Final Technical Takeaway</h3>
+            <p>
+                Through this project, we have demonstrated the power of data storytelling in addressing real-world challenges. By marrying technical precision with impactful visual design, the project provides a scalable framework for traffic accident analysis applicable to other regions. This holistic approach offers a pathway to informed, actionable solutions for reducing accidents and enhancing road safety.
+            </p>
+        </footer>
+        
 </body>
 
 </html>

@@ -16,21 +16,21 @@ body {
     align-items: center;
     width: 80%;
     height: 600px;
-    margin-bottom: 50px;
+    margin-bottom: 10px;
 }
 
-/* Default chart positioning (chart on left, text on right) */
+
 .chart-container {
-    width: 80%;  /* Adjust the width of the chart */
+    width: 80%;  
     height: 100%;
 }
 
 .text-container {
-    width: 18%;  /* Adjust the width for the text */
+    width: 18%;  
     padding: 10px;
 }
 
-/* CSS to alternate layout */
+
 .container:nth-child(odd) .chart-container {
     order: 1;
 }
@@ -47,7 +47,7 @@ body {
     order: 1;
 }
 
-/* Optional: Adjust chart size */
+
 #heatmap-svg,
 #car-clock-svg,
 #geospatial-svg,
@@ -86,7 +86,7 @@ width: 100%;
 }
 
 
-/* Adjust text styling */
+
 h3 {
     font-size: 18px;
     color: #fff;
@@ -97,15 +97,108 @@ p {
     color: #ccc;
     font-size: 14px;
 }
-/* Initial state for text (hidden, before scrolling into view) */
+
 .text-container {
     opacity: 0;
-    transform: translateY(50px);  /* Optional: makes the text start from below */
+    transform: translateY(50px);  
     transition: opacity 0.6s ease, transform 0.6s ease;
 }
 
-/* Visible state (when scrolled into view) */
+
 .text-container.visible {
     opacity: 1;
-    transform: translateY(0);  /* Text moves to its original position */
+    transform: translateY(0);  
 }
+
+header {
+    background-color: #000; 
+    color: #f0f0f0; 
+    text-align: center;
+    padding: 40px 20px;
+    border-bottom: 2px solid #444; 
+}
+
+header h1 {
+    font-size: 36px; 
+    margin: 0;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+header p:first-of-type {
+    font-size: 18px; 
+    margin: 10px 0;
+    font-style: italic;
+    color: #ccc; 
+}
+
+header p:last-of-type {
+    font-size: 16px; 
+    margin: 10px auto 0 auto;
+    line-height: 1.8;
+    max-width: 800px;
+    color: #ddd; 
+}
+
+footer {
+    color: #ddd; 
+    padding: 40px 20px;
+    text-align: center;
+}
+
+footer h3 {
+    color: #f0f0f0;
+    margin: 20px 0 10px 0;
+    font-size: 22px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+footer p {
+    font-size: 16px;
+    line-height: 1.8;
+    text-align: justify; 
+    margin: 0 auto 30px auto; 
+    max-width: 800px; 
+}
+
+footer p:last-child {
+    margin-bottom: 0; 
+}
+
+footer br {
+    line-height: 2; 
+}
+#introduction {
+    /* background-color: #111; */
+    color: #eee;
+    /* padding: 40px 20px;
+    /* margin: 20px auto; */
+    max-width: 900px;
+    /* border: 2px solid #444; */
+    /* border-radius: 10px; */
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); */ 
+}
+
+#introduction h2 {
+    color: #850b0b;
+    font-size: 28px;
+    text-align: center;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#introduction p {
+    font-size: 18px;
+    line-height: 1.8;
+    text-align: justify;
+}
+.visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
