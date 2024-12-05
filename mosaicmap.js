@@ -69,62 +69,62 @@ function delnan(light) {
     return lightMap[light] || "Other";
 }
 
-function showDetails(d, originalData, selectedYear) {
-    const detailsDiv = d3.select("#details");
-    detailsDiv.html("");
+// function showDetails(d, originalData, selectedYear) {
+//     const detailsDiv = d3.select("#details");
+//     detailsDiv.html("");
 
-    const filteredData = originalData.filter(item => {
-        const itemYear = new Date(item.crash_date_time).getFullYear();
-        return (selectedYear === "All" || itemYear == selectedYear) && delnan(item.light) === d.light && item.injury_severity === d.severity;
-    });
+//     const filteredData = originalData.filter(item => {
+//         const itemYear = new Date(item.crash_date_time).getFullYear();
+//         return (selectedYear === "All" || itemYear == selectedYear) && delnan(item.light) === d.light && item.injury_severity === d.severity;
+//     });
 
-    const container = detailsDiv.append("div")
-        .attr("class", "details-container");
+//     const container = detailsDiv.append("div")
+//         .attr("class", "details-container");
 
-    container.append("h3")
-        .text(`Details for ${d.light} - ${d.severity} (${selectedYear})`);
+//     container.append("h3")
+//         .text(`Details for ${d.light} - ${d.severity} (${selectedYear})`);
 
-    const stats = container.append("div")
-        .attr("class", "stats-container");
+//     const stats = container.append("div")
+//         .attr("class", "stats-container");
 
-    stats.append("p")
-        .text(`Total Accidents: ${filteredData.length}`);
+//     stats.append("p")
+//         .text(`Total Accidents: ${filteredData.length}`);
 
-    const timeData = d3.rollup(filteredData, v => v.length, d => new Date(d.crash_date_time).getHours());
+//     const timeData = d3.rollup(filteredData, v => v.length, d => new Date(d.crash_date_time).getHours());
 
-    const timeChart = container.append("div")
-        .attr("class", "time-distribution");
+//     const timeChart = container.append("div")
+//         .attr("class", "time-distribution");
 
-    const table = container.append("table");
-    const headers = ["Date", "Time", "Vehicle Make", "Vehicle Model", "Weather", "Surface Condition"];
+//     const table = container.append("table");
+//     const headers = ["Date", "Time", "Vehicle Make", "Vehicle Model", "Weather", "Surface Condition"];
 
-    table.append("thead")
-        .append("tr")
-        .selectAll("th")
-        .data(headers)
-        .enter()
-        .append("th")
-        .text(d => d);
+//     table.append("thead")
+//         .append("tr")
+//         .selectAll("th")
+//         .data(headers)
+//         .enter()
+//         .append("th")
+//         .text(d => d);
 
-    const rows = table.append("tbody")
-        .selectAll("tr")
-        .data(filteredData)
-        .enter()
-        .append("tr");
+//     const rows = table.append("tbody")
+//         .selectAll("tr")
+//         .data(filteredData)
+//         .enter()
+//         .append("tr");
 
-    rows.selectAll("td")
-        .data(row => [
-            new Date(row.crash_date_time).toLocaleDateString(),
-            new Date(row.crash_date_time).toLocaleTimeString(),
-            row.vehicle_make,
-            row.vehicle_model,
-            row.weather,
-            row.surface_condition
-        ])
-        .enter()
-        .append("td")
-        .text(d => d);
-}
+//     rows.selectAll("td")
+//         .data(row => [
+//             new Date(row.crash_date_time).toLocaleDateString(),
+//             new Date(row.crash_date_time).toLocaleTimeString(),
+//             row.vehicle_make,
+//             row.vehicle_model,
+//             row.weather,
+//             row.surface_condition
+//         ])
+//         .enter()
+//         .append("td")
+//         .text(d => d);
+// }
 
 function processData(data, selectedYear) {
     const lightSeverityMap = {};
@@ -244,9 +244,9 @@ function createViz(data) {
                     .duration(500)
                     .style("opacity", 0);
             })
-            .on("click", (event, d) => {
-                showDetails(d, originalData, selectedYear);
-            });
+            // .on("click", (event, d) => {
+            //     showDetails(d, originalData, selectedYear);
+            // });
 
         chartGroup.selectAll(".count-label")
             .data(mosaicData)
