@@ -4,7 +4,21 @@ const fs = require('fs');
 const json2csv = require('json2csv').parse;
 const app = express();
 const port = 5000;
+const turf = require('@turf/turf');
+const geoData = JSON.parse(fs.readFileSync('./Zip_Code.geojson'));
 
+function findZipCode(lat, lon) {
+    const point = turf.point([lon, lat]);
+    for (const feature of geoData.features) {
+        if (turf.booleanPointInPolygon(point, feature)) {
+            return {
+                zipcode: feature.properties.ZIPCODE || null,
+                place: feature.properties.POSTAL || null
+            };
+        }
+    }
+    return { zipcode: null, place: null };
+}
 app.get('/data-cleaning', async (req, res) => {
     try {
         const csvFilePath = "./raw_data.csv"
@@ -14,6 +28,7 @@ app.get('/data-cleaning', async (req, res) => {
         let i = 0
         while(i<jsonArray.length){
             let data = jsonArray[i]
+            const locationInfo = findZipCode(+data['Latitude'], +data['Longitude']);
             if (
                 data['Crash Date/Time'] && String(data['Crash Date/Time']).trim().toLowerCase() != 'na' &&
                 data['Collision Type'] && String(data['Collision Type']).trim().toLowerCase() != 'na' &&
@@ -52,7 +67,9 @@ app.get('/data-cleaning', async (req, res) => {
                     vehicle_model: data['Vehicle Model'],
                     latitude: data['Latitude'],
                     longitude: data['Longitude'],
-                    location: data['Location']
+                    location: data['Location'],
+                    zipcode: locationInfo.zipcode,
+                    place: locationInfo.place
                 })
             }
             i += 5
