@@ -50,12 +50,21 @@ body {
 
 #heatmap-svg,
 #car-clock-svg,
-#geospatial-svg,
-#splom-svg,
-#stacked-bar-chart-svg{
+#geospatial-svg{
     width: 100%;
     height: 90%;
     margin: auto;
+}
+#splom-svg{
+    width: 100%;
+    height: 100%;
+    margin: -5px;
+}
+
+#stacked-bar-chart-svg{
+    width: 90%;
+    height: 100%;
+    margin: 50px;
 }
 
 .tree-chart-container{
@@ -202,3 +211,15 @@ footer br {
     transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
+.custom-tooltip {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 8px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    display: none;
+    pointer-events: none;
+    z-index: 1000;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+}

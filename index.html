@@ -8,6 +8,7 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/rbush"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="./main.css">
 </head>
 
@@ -16,6 +17,7 @@
         <h1>Mapping Accident Trends and Patterns in Maryland: A Data-Driven Story</h1>
         <p>Data Visualization Course Projects | Aman-Anirudh-Ashutosh-Harsh-Soumya</p>
     </header>
+<body>
     <section id="introduction">
         <h2>Introduction</h2>
         <p>
@@ -28,47 +30,72 @@
             <svg id="heatmap-svg" width="100%" height="100%" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMid meet"></svg>
         </div>
         <div class="text-container">
-            <h3>Mosaic charts of accident severity vs light</h3>
+            <h3>
+                Mosaic charts of accident severity vs light
+                <div class="info-icon" title="This heatmap visualizes accident severity trends over light conditions and years.">
+                    <i class="fa-solid fa-circle-info fa-sm" style="color: #e3e3e3;"></i>
+                </div>
+            </h3>
             <p>The Mosaic Chart bridges light conditions and injury outcomes, identifying year-over-year trends for evaluating the effectiveness of safety measures.</p>
         </div>
     </div>
-
+    
     <div class="container">
         <div class="chart-container">
             <svg id="car-clock-svg" width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet"></svg>
         </div>
         <div class="text-container">
-            <h3>Car in a Clock: Spider chart comparing the number of accidents and injury severity</h3>
+            <h3>
+                Car in a Clock: Spider chart comparing the number of accidents and injury severity
+                <div class="info-icon" title="This spider chart illustrates the relationship between collision points, vehicle types, and injury severity.">
+                    <i class="fa-solid fa-circle-info fa-sm" style="color: #e3e3e3;"></i>
+                </div>
+            </h3>
             <p>The Car-in-a-Clock visualization innovatively connects collision points and vehicle types with injury severities, enhancing interpretability of directional impact dynamics.</p>
         </div>
     </div>
-
+    
     <div class="container">
         <div class="chart-container">
             <svg id="geospatial-svg" width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet"></svg>
         </div>
         <div class="text-container">
-            <h3>Geospatial map for locations and accident severity</h3>
+            <h3>
+                Geospatial map for locations and accident severity
+                <div class="info-icon" title="This map highlights accident hotspots and combines postal region severity with location clusters.">
+                    <i class="fa-solid fa-circle-info fa-sm" style="color: #e3e3e3;"></i>
+                </div>
+            </h3>
             <p>The Geo-Spatial Map effectively highlights accident hotspots, combining postal region severity with specific location clusters for a dual-layered understanding of spatial patterns.</p>
         </div>
     </div>
-
+    
     <div class="container">
         <div class="chart-container">
             <svg id="splom-svg" width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet"></svg>
         </div>
         <div class="text-container">
-            <h3>SPLOM chart for comparing accidents against car brands</h3>
+            <h3>
+                SPLOM chart for comparing accidents against car brands
+                <div class="info-icon" title="This matrix assesses the influence of car origin and manufacturing year on accident severity.">
+                    <i class="fa-solid fa-circle-info fa-sm" style="color: #e3e3e3;"></i>
+                </div>
+            </h3>
             <p>The Pie Chart Matrix showcases the influence of car origin and manufacturing year on accident severity, providing a detailed assessment of vehicle safety evolution.</p>
         </div>
     </div>
-
-    <div class="container" >
+    
+    <div class="container">
         <div class="chart-container">
             <svg id="stacked-bar-chart-svg" width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet"></svg>
         </div>
         <div class="text-container">
-            <h3>Stacked bar chart matrix for Weather conditions and Light Conditions plotted against No of Accidents</h3>
+            <h3>
+                Stacked bar chart matrix for Weather conditions and Light Conditions plotted against No of Accidents
+                <div class="info-icon" title="This chart correlates weather and light conditions with the number and severity of accidents.">
+                    <i class="fa-solid fa-circle-info fa-sm" style="color: #e3e3e3;"></i>
+                </div>
+            </h3>
             <p>Stacked Bar Charts and Treemaps delve into environmental factors, correlating conditions like light and weather with accident causation and severity.</p>
         </div>
     </div>
@@ -116,9 +143,42 @@
         
             lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
         }
+
+        function initializeTooltips() {
+            const infoIcons = document.querySelectorAll(".info-icon");
+
+            infoIcons.forEach(icon => {
+                
+                const tooltip = document.createElement("div");
+                tooltip.classList.add("custom-tooltip");
+                tooltip.innerText = icon.getAttribute("title"); 
+                icon.setAttribute("title", ""); 
+                document.body.appendChild(tooltip);
+
+                icon.addEventListener("mouseover", (event) => {
+                    tooltip.innerText = icon.dataset.tooltip || tooltip.innerText; 
+                    tooltip.style.display = "block";
+                    tooltip.style.left = event.pageX + 10 + "px"; 
+                    tooltip.style.top = event.pageY + 10 + "px";
+                });
+
+                
+                icon.addEventListener("mouseout", () => {
+                    tooltip.style.display = "none";
+                });
+
+                icon.addEventListener("mousemove", (event) => {
+                    tooltip.style.left = event.pageX + 10 + "px";
+                    tooltip.style.top = event.pageY + 10 + "px";
+                });
+            });
+            }
         
         window.addEventListener('scroll', handleScroll);
-        handleScroll();
+        document.addEventListener('DOMContentLoaded', () => {
+            handleScroll(); 
+            initializeTooltips();
+        });
         </script>
         <footer>
             <h3>Interactivity and User-Centric Design</h3>
