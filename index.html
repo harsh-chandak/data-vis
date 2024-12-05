@@ -14,14 +14,18 @@
 
 
     <header>
-        <h1>Mapping Accident Trends and Patterns in Maryland: A Data-Driven Story</h1>
-        <p>Data Visualization Course Projects | Aman-Anirudh-Ashutosh-Harsh-Soumya</p>
+        <h1>Mapping Accident Trends and Patterns in Montgomery County</h1>
+        <h2>A Data-Driven Story</h2>
+        <p style="text-align: center;">Data Visualization Course Projects | Aman-Anirudh-Ashutosh-Harsh-Soumya</p>
     </header>
 <body>
     <section id="introduction">
         <h2>Introduction</h2>
         <p>
-            The culmination of our data visualization project provides a comprehensive analysis of traffic accidents in Montgomery County, revealing critical insights into accident dynamics, environmental and behavioral influences, and vehicle-specific safety trends. By leveraging advanced visual analytics, we have successfully transformed a complex dataset into an actionable narrative that supports data-driven decision-making.
+            Road safety is a shared responsibility, but understanding what drives accidents can be complex. In Montgomery County, thousands of traffic accidents occur each year, influenced by a mix of environmental conditions, driver behavior, and vehicle design. This project brings these stories to life through a series of engaging visualizations, each highlighting a unique aspect of accident dynamics.
+            <br><br>
+            Starting with a geo-spatial map to pinpoint hotspots, the journey explores not just where accidents happen but also the factors behind them—like lighting, weather, and road conditions. One of the most novel visualizations, the Car-in-a-Clock, maps collision points onto a clock face to reveal how impact direction and vehicle type influence injury severity. From stacked bar charts to mosaic charts and a treemap, each visualization connects the dots between data and actionable insights. Together, they provide a fresh perspective on traffic safety, inviting everyone—from policymakers to everyday drivers—to join the effort to create safer roads.
+
         </p>
     </section>
     
@@ -30,13 +34,25 @@
             <svg id="heatmap-svg" width="100%" height="100%" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMid meet"></svg>
         </div>
         <div class="text-container">
-            <h3>
-                Mosaic charts of accident severity vs light
-                <div class="info-icon" title="This heatmap visualizes accident severity trends over light conditions and years.">
-                    <i class="fa-solid fa-circle-info fa-sm" style="color: #e3e3e3;"></i>
+            <h3>Mosaic charts of Injury severity vs Light conditions</h3>
+            <div class="info-icon">
+                <i class="fa-solid fa-circle-info fa-sm" style="color: #e3e3e3;"></i>
+                <div class="tooltip">
+                    Select the two years you want to analyze from the dropdowns. The mosaic charts for the corresponding years will be shown. Hover over each tile for more information.
                 </div>
-            </h3>
-            <p>The Mosaic Chart bridges light conditions and injury outcomes, identifying year-over-year trends for evaluating the effectiveness of safety measures.</p>
+            </div>
+            <p>The mosaic chart shows how lighting conditions, like "Daylight" or "Dusk," correlate with injury severity in traffic accidents. Each segment represents a light condition, divided by injury severities such as "No Apparent Injury" or "Fatal Injury."
+                <br><br>
+                <span style="font-weight: bold;">Key Insights:</span>
+                <br><br>
+                <span style="font-weight: bold;">• Trends:</span> Analyze how lighting impacts injury severity to identify patterns and safety concerns.
+                <br><br>
+                <span style="font-weight: bold;">• Interactivity:</span> Filter data by year to compare trends over time.
+                <br><br>
+                <span style="font-weight: bold;">• Data Representation:</span> Segment size shows accident counts, and colors reflect injury severity for quick interpretation.
+                <br><br>
+                This chart aids researchers, policymakers, and safety advocates in improving road safety using data-driven insights.
+            </p>            
         </div>
     </div>
     
@@ -45,13 +61,20 @@
             <svg id="car-clock-svg" width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet"></svg>
         </div>
         <div class="text-container">
-            <h3>
-                Car in a Clock: Spider chart comparing the number of accidents and injury severity
-                <div class="info-icon" title="This spider chart illustrates the relationship between collision points, vehicle types, and injury severity.">
-                    <i class="fa-solid fa-circle-info fa-sm" style="color: #e3e3e3;"></i>
+            <h3>Car in a Clock: Spider chart comparing the number of accidents and injury severity</h3>
+            <div class="info-icon">
+                <i class="fa-solid fa-circle-info fa-sm" style="color: #e3e3e3;"></i>
+                <div class="tooltip">
+                    • Hover over blue points to see accident counts and orange points for injury severity details. 
+                    <br><br>
+                    • Link data to real-world scenarios using the car-clock metaphor (e.g., '12 o'clock' = frontal impacts).
+                    <br><br>
+                    • Rotate the wheel to compare trends across vehicle types like SUVs or smaller cars.
+                    <br><br>
+                    • Click on the blue and orange button on the right to toggle the charts.
                 </div>
-            </h3>
-            <p>The Car-in-a-Clock visualization innovatively connects collision points and vehicle types with injury severities, enhancing interpretability of directional impact dynamics.</p>
+            </div>
+            <p>The <span style="font-weight: bold;">Car-in-a-Clock</span> visualization maps accident data onto a clock face, representing impact directions. At its center is a spider chart that compares accident frequency (blue) and injury severity (orange). Beneath the chart, a car silhouette links data points to real-world scenarios—each clock position corresponds to a specific collision direction (e.g., '12 o'clock' for frontal impacts). A wheel on the right lets users explore how accident trends vary by vehicle type, such as SUVs or smaller cars. This tool highlights patterns in accident dynamics and injury severity influenced by collision direction and vehicle design.</p>
         </div>
     </div>
     
@@ -60,12 +83,18 @@
             <svg id="geospatial-svg" width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet"></svg>
         </div>
         <div class="text-container">
-            <h3>
-                Geospatial map for locations and accident severity
-                <div class="info-icon" title="To use the traffic accident map, select regions by accident severity using the dropdown menu and toggle accident markers with the checkbox. The legend shows the severity color scale. Hover over a postal region to view the number of accidents there, and hover over any location icon to see details about light conditions, collision type, vehicle make and model, and accident severity. This interactive map helps identify high-risk areas and patterns in traffic accidents.">
-                    <i class="fa-solid fa-circle-info fa-sm" style="color: #e3e3e3;"></i>
+            <h3>Geospatial map for locations and accident severity</h3>
+            <div class="info-icon">
+                <i class="fa-solid fa-circle-info fa-sm" style="color: #e3e3e3;"></i>
+                <div class="tooltip">
+                    <span style="font-weight: bold;">• Region Selection:</span> Use the dropdown to filter by accident severity.<br><br>
+                    <span style="font-weight: bold;">• Toggle Markers:</span> Use the checkbox to show/hide accident markers.<br><br>
+                    <span style="font-weight: bold;">• Legend:</span> Displays severity color scale.<br><br>
+                    <span style="font-weight: bold;">• Postal Region Details:</span> Hover to view accident counts.<br><br>
+                    <span style="font-weight: bold;">• Accident Details:</span> Hover over location icons to see light conditions, collision type, vehicle details, and severity.<br><br>
+                    <span style="font-weight: bold;">• Purpose:</span> Identify high-risk areas and traffic accident patterns.
                 </div>
-            </h3>
+            </div>
             <p>This map visualizes traffic accident data across Montgomery County, Maryland, highlighting accident severity, locations, and contributing factors. It displays postal areas with varying accident frequencies and severity, helping identify high-risk zones and accident hotspots. The map also shows the relationship between accident types, vehicle involvement, and road safety conditions. By analyzing this data, local authorities can implement targeted safety measures to improve road conditions and reduce accident rates.</p>
         </div>
     </div>
@@ -75,28 +104,35 @@
             <svg id="splom-svg" width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet"></svg>
         </div>
         <div class="text-container">
-            <h3>
-                SPLOM chart for comparing accidents against car brands
-                <div class="info-icon" title="This matrix assesses the influence of car origin and manufacturing year on accident severity.">
-                    <i class="fa-solid fa-circle-info fa-sm" style="color: #e3e3e3;"></i>
+            <h3>SPLOM chart for comparing accidents against car brands</h3>
+            <div class="info-icon">
+                <i class="fa-solid fa-circle-info fa-sm" style="color: #e3e3e3;"></i>
+                <div class="tooltip">
+                    <span style="font-weight: bold;">• X-Axis:</span> Displays the year range.  <br>
+                    <span style="font-weight: bold;">• Y-Axis:</span> Shows car brands' countries of origin.  <br>
+                    <span style="font-weight: bold;">• Cells:</span> Contain pie charts representing accident severity, with red borders for fatal injury cases.  <br>
+                    <span style="font-weight: bold;">• Hover Interaction:</span> Enlarges the pie and displays exact severity percentages as text labels.
                 </div>
-            </h3>
-            <p>The Pie Chart Matrix showcases the influence of car origin and manufacturing year on accident severity, providing a detailed assessment of vehicle safety evolution.</p>
+            </div>
+            <p>
+                This pie chart matrix visualization maps accident severity based on the car brand's country of origin and the manufacturing year. The chart highlights how manufacturing defects or older car models may influence the frequency and severity of accidents.
+            </p>
         </div>
     </div>
     
-    <div class="container">
+    <div class="container" style="height: 1000px;">
         <div class="chart-container">
             <svg id="stacked-bar-chart-svg" width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet"></svg>
         </div>
         <div class="text-container">
-            <h3>
-                Stacked bar chart matrix for Weather conditions and Light Conditions plotted against No of Accidents
-                <div class="info-icon" title="This chart correlates weather and light conditions with the number and severity of accidents.">
-                    <i class="fa-solid fa-circle-info fa-sm" style="color: #e3e3e3;"></i>
+            <h3>Stacked bar chart matrix for Weather conditions and Light Conditions plotted against No of Accidents</h3>
+            <div class="info-icon">
+                <i class="fa-solid fa-circle-info fa-sm" style="color: #e3e3e3;"></i>
+                <div class="tooltip">
+                    Hover over any box to see more interesting numbers and click for a tree map on road conditions.
                 </div>
-            </h3>
-            <p>Stacked Bar Charts and Treemaps delve into environmental factors, correlating conditions like light and weather with accident causation and severity.</p>
+            </div>
+            <p>The stacked bar chart matrix provides a comparative analysis of traffic accidents in Montgomery County, segmented by light and weather conditions while highlighting driver faults. Each bar represents the count of accidents for specific light and weather scenarios, subdivided by whether the driver was at fault. This visualization reveals key insights: daylight accidents, despite better visibility, often stem from human error, while adverse weather conditions (e.g., snow or rain) amplify risks due to reduced visibility and slippery surfaces. The chart underscores the importance of adaptive safety measures, including public awareness campaigns and advanced vehicle technologies, to address these critical risk factors. <span style="font-style: italic;">So, it's not always the driver's fault :))</span></p>
         </div>
     </div>
     <div class ="tree-container">
@@ -179,27 +215,29 @@
             handleScroll(); 
             initializeTooltips();
         });
-        </script>
-        <footer>
-            <h3>Interactivity and User-Centric Design</h3>
-            <p>
-                Dropdowns, tooltips, and clickable features across visualizations enable granular exploration of the data, making the insights accessible to diverse stakeholders, from policymakers to the general public.
-            </p>
-        
-            <h3>Data-Driven Insights for Road Safety</h3>
-            <p>
-                • Spatial analysis pinpointed high-risk regions requiring infrastructure upgrades.
-                <br />
-                • Behavioral patterns and environmental conditions underscored the need for targeted interventions, such as enhanced driver education during adverse conditions and improved road maintenance.
-                <br />
-                • Vehicle-specific trends highlighted gaps in safety standards for older models, driving a call for stricter regulations and consumer awareness of modern safety features.
-            </p>
-        
-            <h3>Final Technical Takeaway</h3>
-            <p>
-                Through this project, we have demonstrated the power of data storytelling in addressing real-world challenges. By marrying technical precision with impactful visual design, the project provides a scalable framework for traffic accident analysis applicable to other regions. This holistic approach offers a pathway to informed, actionable solutions for reducing accidents and enhancing road safety.
-            </p>
-        </footer>
+    </script>
+    <footer>
+        <h3>Interactivity and User-Centric Design</h3>
+        <p>
+            Dropdowns, tooltips, and clickable features across visualizations enable granular exploration of the data, making the insights accessible to diverse stakeholders, from policymakers to the general public.
+        </p>
+    
+        <h3>Data-Driven Insights for Road Safety</h3>
+        <p>
+            • Spatial analysis pinpointed high-risk regions requiring infrastructure upgrades.
+            <br />
+            • Behavioral patterns and environmental conditions underscored the need for targeted interventions, such as enhanced driver education during adverse conditions and improved road maintenance.
+            <br />
+            • Vehicle-specific trends highlighted gaps in safety standards for older models, driving a call for stricter regulations and consumer awareness of modern safety features.
+        </p>
+    
+        <h3>Final Takeaway</h3>
+        <p>
+            The visualizations uncover key patterns in Montgomery County's traffic accidents. The geo-spatial map highlights severe collisions in poorly lit, high-traffic areas, while the Car-in-a-Clock reveals that frontal collisions are most frequent, with side impacts causing greater injury severity. Stacked bar charts show that daylight accidents often result from driver error, and treemaps emphasize the risks of icy and wet roads. The mosaic chart connects poor lighting at dawn and dusk to higher injury rates, and the pie chart matrix demonstrates how the vehicle's country of origin and age can affect the accident's severity.
+            <br><br>
+            This project highlights the influence of weather, surface conditions, and driver behavior, offering clear takeaways for prevention. It’s a reminder that safer roads require a combination of smarter design, better technology, and mindful driving. By transforming data into insights and insights into action, we can make roads in Montgomery County—and beyond—safer for everyone, one journey at a time.
+        </p>
+    </footer>
         
 </body>
 

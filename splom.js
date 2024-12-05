@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let filteredMakes = Object.keys(makeCount).filter(make => makeCount[make] > 10);
 
         // Step 3: Output the filtered makes
-        console.log(filteredMakes);
+        // console.log(filteredMakes);
         const data = processData(rawData);
         createPieChartMatrix(data);
     });

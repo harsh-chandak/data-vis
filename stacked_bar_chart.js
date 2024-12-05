@@ -373,14 +373,17 @@ document.addEventListener('DOMContentLoaded', function () {
             
             d3.select("#tree-map").remove()
             d3.select("#tree-text").remove()
-            d3.select("#stack-container").append("h4").attr("id", "tree-text")
+            d3.select("#stack-container").style("margin-top", "20px").append("h3")
+                .attr("id", "tree-text")
+                .style('width', '20%')
                 .html(`Tree-map based on Surface Condition for <strong style="font-weight: bold; font-style: italic; text-decoration: underline;">${weather}</strong> weather, <strong style="font-weight: bold; font-style: italic; text-decoration: underline;">${light}</strong> lights and where driver is <strong style="font-weight: bold; font-style: italic; text-decoration: underline;"> ${fault ? ' At' : ' Not At'} </strong> Fault`)
+                .append('p')
+                    .html('The treemap visualizes the relationship between surface conditions (dry, wet, icy) and accidents, emphasizing how adverse conditions significantly influence the likelihood and severity of accidents, pointing to the need for better infrastructure and maintenance during extreme weather.');
 
             const svg = d3.select("#stack-container").append("svg")
                 .attr("id", "tree-map")
-                .attr("width", width * 2)
-                .attr("height", height * 2)
-                .style("margin-top", "20px")
+                .attr("width", '80%')
+                .attr("height", height * 2);
 
             let obj = {}
             data.forEach(d => {
@@ -391,7 +394,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             })
 
-            console.log(obj)
+            // console.log(obj)
             let treemap_data = Object.keys(obj).map(key => ({
                 name: key,
                 value: obj[key]
@@ -413,7 +416,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const chart_group = svg.append("g")
                 .attr("class", "tree-map")
-                .attr("transform", `translate(${x_offset / 3}, 5)`)
+                .attr("transform", `translate(${x_offset-100}, 5)`)
 
             const nodes = chart_group.selectAll(".node")
                 .data(root.leaves())

@@ -212,8 +212,8 @@ document.addEventListener('DOMContentLoaded', function () {
             //      .attr("fill", "red");
                 const zipCode = d.properties.ZIPCODE;
                 const severityCounts = zipSeverityMap.get(String(zipCode));
-                console.log(zipCode);
-                console.log(severityCounts);
+                // console.log(zipCode);
+                // console.log(severityCounts);
                 let tooltipContent = "ZIP Code: " + zipCode + "<br/>" + "Postal: " + d.properties.POSTAL + "<br/><br/>";
                 severities.forEach(function(severity) {
                     const count = severityCounts ? severityCounts.get(severity) || 0 : 0;
@@ -365,7 +365,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // const isChecked = d3.select(this).property("checked");
                 // console.log(isChecked)
                 if (event.target.checked) {
-                    console.log("check box checked")
+                    // console.log("check box checked")
                     showAccidents = true;
                     svg.selectAll("image")
                         .data(filteredData)
