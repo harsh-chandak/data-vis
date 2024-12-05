@@ -21,12 +21,12 @@ body {
 
 /* Default chart positioning (chart on left, text on right) */
 .chart-container {
-    width: 70%;  /* Adjust the width of the chart */
+    width: 80%;  /* Adjust the width of the chart */
     height: 100%;
 }
 
 .text-container {
-    width: 28%;  /* Adjust the width for the text */
+    width: 18%;  /* Adjust the width for the text */
     padding: 10px;
 }
 
@@ -58,12 +58,33 @@ body {
     margin: auto;
 }
 
+.tree-chart-container{
+width: 100%;
+    height: 100%;
+    margin: auto;
+    align-items: center;
+}
+
 #tree-map {
     width: 100%;
     height: 100%;
     margin: auto;
     align-items: center;
 }
+
+.tree-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 600px;
+    margin-bottom: 50px;
+}
+
+.tree-container, .tree-chart-container {
+    display: none; 
+}
+
 
 /* Adjust text styling */
 h3 {

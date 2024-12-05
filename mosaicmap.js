@@ -151,15 +151,71 @@ function processData(data, selectedYear) {
 
 function createViz(data) {
     const years = ["All", ...new Set(data.map(d => new Date(d.crash_date_time).getFullYear()))].sort();
+    
+    const svg = d3.select("#heatmap-svg")
+        .attr("width", tWd)
+        .attr("height", height + margin.top + margin.bottom);
 
-    const yearSelects = d3.selectAll("#year-select-1, #year-select-2")
+    // Create dropdown for the first chart
+    const dropdown1 = svg.append("foreignObject")
+        .attr("x", margin.left)
+        .attr("y", 10)
+        .attr("width", 200)
+        .attr("height", 40)
+        .append("xhtml:select")
+        .attr("id", "year-select-1")
         .attr("class", "year-select")
-        .selectAll("option")
-        .data(years)
-        .enter()
-        .append("option")
-        .text(d => d)
-        .attr("value", d => d);
+        .style("padding", "5px")
+        .style("font-size", "14px")
+        .style("background-color", "#2c3e50")
+        .style("color", "white")
+        .style("border", "1px solid #34495e")
+        .style("border-radius", "4px");
+
+    // Create dropdown for the second chart
+    const dropdown2 = svg.append("foreignObject")
+        .attr("x", singleWidth + margin.left * 2)
+        .attr("y", 10)
+        .attr("width", 200)
+        .attr("height", 40)
+        .append("xhtml:select")
+        .attr("id", "year-select-2")
+        .attr("class", "year-select")
+        .style("padding", "5px")
+        .style("font-size", "14px")
+        .style("background-color", "#2c3e50")
+        .style("color", "white")
+        .style("border", "1px solid #34495e")
+        .style("border-radius", "4px");
+
+    // Add options to both dropdowns
+    [dropdown1, dropdown2].forEach(dropdown => {
+        dropdown.selectAll("option")
+            .data(years)
+            .enter()
+            .append("option")
+            .text(d => d)
+            .attr("value", d => d);
+    });
+
+    // Set initial values for both selects to "2015"
+    dropdown1.property("value", "2015");
+    dropdown2.property("value", "2015");
+
+    // Add event listeners to the dropdowns
+    dropdown1.on("change", function() {
+        closeDetails();
+        updateViz(this.value, dropdown2.property("value"));
+    });
+
+    dropdown2.on("change", function() {
+        closeDetails();
+        updateViz(dropdown1.property("value"), this.value);
+    });
+
+    // Initial call to updateViz with "2015" for both charts
+    updateViz("2015", "2015");
+
 
     function mosaicChart(svg, processedData, xOffset, selectedYear, originalData) {
         const totalAccidents = d3.sum(Object.values(processedData), d => d.total);
@@ -303,7 +359,7 @@ function createViz(data) {
         chartGroup.append("text")
             .attr("transform", "rotate(-90)")
             .attr("x", -height / 2)
-            .attr("y", -80)
+            .attr("y", -60)
             .attr("text-anchor", "middle")
             .style("font-size", "14px")
             .style("fill", "white")
@@ -340,11 +396,61 @@ function createViz(data) {
         const processedData1 = processData(data, selectedYear1);
         const processedData2 = processData(data, selectedYear2);
 
-        d3.select("#heatmap-svg").selectAll("*").remove();
+        svg.selectAll("*").remove();
 
-        const svg = d3.select("#heatmap-svg")
-            .attr("width", tWd)
-            .attr("height", height + margin.top + margin.bottom);
+        // Recreate dropdowns
+        const dropdown1 = svg.append("foreignObject")
+            .attr("x", margin.left)
+            .attr("y", 10)
+            .attr("width", 200)
+            .attr("height", 40)
+            .append("xhtml:select")
+            .attr("id", "year-select-1")
+            .attr("class", "year-select")
+            .style("padding", "5px")
+            .style("font-size", "14px")
+            .style("background-color", "#2c3e50")
+            .style("color", "white")
+            .style("border", "1px solid #34495e")
+            .style("border-radius", "4px");
+
+        const dropdown2 = svg.append("foreignObject")
+            .attr("x", singleWidth + margin.left * 2)
+            .attr("y", 10)
+            .attr("width", 200)
+            .attr("height", 40)
+            .append("xhtml:select")
+            .attr("id", "year-select-2")
+            .attr("class", "year-select")
+            .style("padding", "5px")
+            .style("font-size", "14px")
+            .style("background-color", "#2c3e50")
+            .style("color", "white")
+            .style("border", "1px solid #34495e")
+            .style("border-radius", "4px");
+
+        // Add options to both dropdowns
+        [dropdown1, dropdown2].forEach(dropdown => {
+            dropdown.selectAll("option")
+                .data(years)
+                .enter()
+                .append("option")
+                .text(d => d)
+                .attr("value", d => d);
+        });
+
+        // Set values and add event listeners
+        dropdown1.property("value", selectedYear1)
+            .on("change", function() {
+                closeDetails();
+                updateViz(this.value, dropdown2.property("value"));
+            });
+
+        dropdown2.property("value", selectedYear2)
+            .on("change", function() {
+                closeDetails();
+                updateViz(dropdown1.property("value"), this.value);
+            });
 
         mosaicChart(svg, processedData1, 0, selectedYear1, data);
         mosaicChart(svg, processedData2, singleWidth + margin.left, selectedYear2, data);
@@ -386,11 +492,11 @@ function createViz(data) {
         }
     });
 
-    
+    // Set initial values for both selects to "All"
     d3.select("#year-select-1").property("value", "2015");
     d3.select("#year-select-2").property("value", "2015");
 
-    
+    // Initial call to updateViz with "All" for both charts
     updateViz("2015", "2015");
 }
 

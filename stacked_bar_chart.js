@@ -365,6 +365,12 @@ document.addEventListener('DOMContentLoaded', function () {
             .attr("marker-end", "url(#arrowhead)")
 
         function createTreeMap(data, x_offset, y_offset, width, height, weather, fault, light) {
+            const treeContainer = document.querySelector('.tree-container');
+            const treeChartContainer = document.querySelector('.tree-chart-container');
+
+            treeContainer.style.display = 'flex';  
+            treeChartContainer.style.display = 'flex'; 
+            
             d3.select("#tree-map").remove()
             d3.select("#tree-text").remove()
             d3.select("#stack-container").append("h4").attr("id", "tree-text")

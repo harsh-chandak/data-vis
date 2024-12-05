@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         .enter().append("text")
                         .attr("transform", d => {
                             const [x, y] = enlargedArc.centroid(d);
-                            const scaleFactor = 1.5;
+                            const scaleFactor = 0.5;
                             return `translate(${x * scaleFactor + centerX}, ${y * scaleFactor + centerY})`;
                         })
                         .attr("text-anchor", "middle")
