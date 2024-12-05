@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const severityScale = d3.scaleOrdinal()
                 .domain(["No Apparent Injury", "Possible Injury", "Suspected Minor Injury", 
                          "Suspected Serious Injury", "Fatal Injury"])
-                .range(["#444444", "#4C555F", "#D8C8A2", "#7B7B68", "#5E8D9E"]);
+                .range(["#444444", "#4C555F", "#D8C8A2", "#7B7B68", "#2F4F4F"]);
 
         // const circleSeverityScale = d3.scaleOrdinal()
         //         .domain(["No Apparent Injury", "Possible Injury", "Suspected Minor Injury", 
@@ -440,72 +440,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 .style("opacity", 0)
                 .remove(); 
         
-                
-            
-                                    // if (showAccidents) {
-            // svg.selectAll("circle")
-            //     .data(filteredData)  
-            //     .transition()  
-            //     .duration(1000)  
-            //     .attr("cx", function(d) { 
-            //         return projection([d.longitude, d.latitude])[0]; 
-            //     })
-            //     .attr("cy", function(d) { 
-            //         return projection([d.longitude, d.latitude])[1]; 
-            //     })
-            //     .attr("fill", function(d) {
-            //         return circleSeverityScale(d.injury_severity);  
-            //     });
-
-            
-            // svg.selectAll("circle")
-            //     .data(filteredData)
-            //     .enter()
-            //     .append("circle")
-            //     .attr("cx", function(d) { 
-            //         return projection([d.longitude, d.latitude])[0]; 
-            //     })
-            //     .attr("cy", function(d) { 
-            //         return projection([d.longitude, d.latitude])[1]; 
-            //     })
-            //     .attr("r", 7)  
-            //     .attr("fill", function(d) {
-            //         d.initialColor = circleSeverityScale(d.injury_severity);
-            //         return circleSeverityScale(d.injury_severity);  
-            //     })
-            //     .attr("stroke", "black")
-            //     .attr("stroke-width", 0.8)
-            //     .attr("opacity", 0.8) 
-            //     .on("mouseover", function(event, d) {
-            //         tooltip.transition().duration(200).style("opacity", .9);
-            //         tooltip.html("Place: " + d.postal+"<br/>Collision Type: " + d.collision_type + "<br/>light: " + d.light + "<br/>Vechical Make: " + d.vehicle_make+ "<br/>Vechical Model: " + d.vehicle_model+ "<br/>Severity: " + d.injury_severity)
-            //             .style("left", (event.pageX + 5) + "px")
-            //             .style("top", (event.pageY - 28) + "px");
-            //         d3.select(this)
-            //         .attr("data-initial-color", d3.select(this).attr("fill"))
-            //             .transition().duration(200)  
-            //             .attr("r", 16)
-            //             .attr("opacity", 1) 
-            //             .attr("fill", "#B22222");
-
-            //     })
-            //     .on("mouseout", function(d) {
-            //         const initialColor = d3.select(this).attr("data-initial-color");
-            //         tooltip.transition().duration(500).style("opacity", 0);
-            //         d3.select(this)
-            //         .transition().duration(200) 
-            //         .attr("r", 7)
-            //         .attr("opacity", 0.8)  
-            //         .attr("fill", initialColor);
-            //     });
-
-            //     svg.selectAll("circle")
-            //         .data(filteredData)
-            //         .exit()
-            //         .transition()  
-            //         .duration(1000)  
-            //         .style("opacity", 0)  
-            //         .remove();
                                             
                                             
         });
