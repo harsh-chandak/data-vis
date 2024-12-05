@@ -1,5 +1,5 @@
 
-    let dataset; 
+let dataset; 
 document.addEventListener('DOMContentLoaded', function () {    
 
     let width = 1000;
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .style("padding", "5px")
             .style("display","none");
         d3.csv("final.csv").then(function(data) {
-            
+        // console.log(data);
         // data.forEach(function(d) {
         //     // console.log(d.injury_severity)
         //     d.latitude = +d.latitude;
@@ -160,19 +160,19 @@ document.addEventListener('DOMContentLoaded', function () {
         // longitude="-76.98235396";
         // zipcode = findZipCode(latitude, longitude);
         // console.log(zipcode);
-        data.forEach(d => {
-            d.latitude = +d.latitude;
-            d.longitude = +d.longitude;
-            const result = findZipCode(d.latitude, d.longitude);
-            if (result) {
-                const { zipcode, postal } = result;
-                d.zipCode = zipcode;
-                d.postal = postal;
-            } else {
-                d.zipCode = null;
-                d.postal = null;
-            }
-        });
+        // data.forEach(d => {
+        //     d.latitude = +d.latitude;
+        //     d.longitude = +d.longitude;
+        //     const result = findZipCode(d.latitude, d.longitude);
+        //     if (result) {
+        //         const { zipcode, postal } = result;
+        //         d.zipCode = zipcode;
+        //         d.postal = postal;
+        //     } else {
+        //         d.zipCode = null;
+        //         d.postal = null;
+        //     }
+        // });
 
         // const zipSeverityCounts = d3.rollups(
         //     data,
@@ -195,9 +195,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
                 return severityCountMap; 
             },
-            d => d.zipCode 
+            d => d.zipcode 
         );
-        
+        // console.log(zipSeverityCounts);
         const zipPaths =svg.selectAll("path")
            .data(dataset.features)
            .enter()
@@ -211,7 +211,9 @@ document.addEventListener('DOMContentLoaded', function () {
             //    d3.select(this)
             //      .attr("fill", "red");
                 const zipCode = d.properties.ZIPCODE;
-                const severityCounts = zipSeverityMap.get(zipCode);
+                const severityCounts = zipSeverityMap.get(String(zipCode));
+                console.log(zipCode);
+                console.log(severityCounts);
                 let tooltipContent = "ZIP Code: " + zipCode + "<br/>" + "Postal: " + d.properties.POSTAL + "<br/><br/>";
                 severities.forEach(function(severity) {
                     const count = severityCounts ? severityCounts.get(severity) || 0 : 0;
@@ -347,7 +349,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     return "#FAFAF0"; 
                 }
                 const zipCode = d.properties.ZIPCODE;
-                const severityCount = zipSeverityMap.get(zipCode)?.get(selectedSeverity) || 0;
+                const severityCount = zipSeverityMap.get(String(zipCode))?.get(selectedSeverity) || 0;
                 const severityColor = severityScale(selectedSeverity); 
                 const intensity = countScale(severityCount); 
                 return d3.color(severityColor).brighter(intensity); 
@@ -390,7 +392,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         .on("mouseover", function(event, d) {
                             tooltip.transition().duration(200).style("opacity", 0.9);
                             tooltip.html(
-                                "Place: " + d.postal +
+                                "Place: " + d.place +
                                 "<br/>Collision Type: " + d.collision_type +
                                 "<br/>Light: " + d.light +
                                 "<br/>Vehicle Make: " + d.vehicle_make +
