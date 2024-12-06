@@ -253,3 +253,14 @@ footer br {
     visibility: visible;
     opacity: 1;
 }
+
+.tooltip-k {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    pointer-events: none;
+    transition: visibility 0.2s, opacity 0.2s;
+}

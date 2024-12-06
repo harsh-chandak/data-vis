@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
     })).then(data => {
         const tooltip = d3.select("body")
             .append("div")
-            .attr("class", "tooltip")
+            .attr("class", "tooltip-k")
             .style("position", "absolute")
             .style("background", "rgba(0, 0, 0, 0.7)")
             .style("color", "white")
@@ -213,8 +213,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                 createTreeMap(
                     matchingData,
-                    total_width + 20,
-                    height + margin.top + 100,
+                    total_width - 100,
+                    margin.top + 20,
                     chart_width * 0.7, height * 0.5,
                     String(weather_condition).replace(/_/g, " ").split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' '),
                     fault,
@@ -416,7 +416,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const chart_group = svg.append("g")
                 .attr("class", "tree-map")
-                .attr("transform", `translate(${x_offset-100}, 5)`)
+                .attr("transform", `translate(${x_offset-100}, ${y_offset})`)
 
             const nodes = chart_group.selectAll(".node")
                 .data(root.leaves())
