@@ -41,7 +41,7 @@
                     Select the two years you want to analyze from the dropdowns. The mosaic charts for the corresponding years will be shown. Hover over each tile for more information.
                 </div>
             </div>
-            <p>The mosaic chart shows how lighting conditions, like "Daylight" or "Dusk," correlate with injury severity in traffic accidents. Each segment represents a light condition, divided by injury severities such as "No Apparent Injury" or "Fatal Injury."
+            <!-- <p>The mosaic chart shows how lighting conditions, like "Daylight" or "Dusk," correlate with injury severity in traffic accidents. Each segment represents a light condition, divided by injury severities such as "No Apparent Injury" or "Fatal Injury."
                 <br><br>
                 <span style="font-weight: bold;">Key Insights:</span>
                 <br><br>
@@ -52,7 +52,8 @@
                 <span style="font-weight: bold;">• Data Representation:</span> Segment size shows accident counts, and colors reflect injury severity for quick interpretation.
                 <br><br>
                 This chart aids researchers, policymakers, and safety advocates in improving road safety using data-driven insights.
-            </p>            
+            </p>             -->
+            <p> This mosaic chart illustrates the correlation between lighting conditions and injury severity in traffic accidents. Each segment represents a lighting condition, with color coding for various injury severities. Use this chart to identify and compare trends and patterns for two years that can inform road safety measures.</p>
         </div>
     </div>
     
@@ -101,7 +102,7 @@
     
     <div class="container">
         <div class="chart-container">
-            <svg id="splom-svg" width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet"></svg>
+            <svg id="splom-svg" width="100%" height="100%" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid meet"></svg>
         </div>
         <div class="text-container">
             <h3>SPLOM chart for comparing accidents against car brands</h3>
@@ -120,7 +121,7 @@
         </div>
     </div>
     
-    <div class="container" style="height: 1000px;">
+    <div class="container">
         <div class="chart-container">
             <svg id="stacked-bar-chart-svg" width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet"></svg>
         </div>
@@ -132,9 +133,10 @@
                     Hover over any box to see more interesting numbers and click for a tree map on road conditions.
                 </div>
             </div>
-            <p>The stacked bar chart matrix provides a comparative analysis of traffic accidents in Montgomery County, segmented by light and weather conditions while highlighting driver faults. Each bar represents the count of accidents for specific light and weather scenarios, subdivided by whether the driver was at fault. This visualization reveals key insights: daylight accidents, despite better visibility, often stem from human error, while adverse weather conditions (e.g., snow or rain) amplify risks due to reduced visibility and slippery surfaces. The chart underscores the importance of adaptive safety measures, including public awareness campaigns and advanced vehicle technologies, to address these critical risk factors. <span style="font-style: italic;">So, it's not always the driver's fault :))</span></p>
+            <p>The stacked bar chart compares traffic accidents by light and weather conditions, emphasizing driver fault. It highlights how daylight accidents often result from human error, while adverse weather (e.g., snow, rain) increases risks due to poor visibility and slippery roads. The visualization advocates for adaptive safety measures like public awareness and advanced vehicle technologies.            </p>
         </div>
     </div>
+
     <div class ="tree-container">
         <div class ="tree-chart-container" id="stack-container">       
         <svg id="tree-map" width="100%" height="100%" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet"></svg>
