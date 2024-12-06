@@ -51,10 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
                          "Suspected Serious Injury", "Fatal Injury"])
                 .range(["#444444", "#4C555F", "#D8C8A2", "#7B7B68", "#2F4F4F"]);
 
-        // const circleSeverityScale = d3.scaleOrdinal()
-        //         .domain(["No Apparent Injury", "Possible Injury", "Suspected Minor Injury", 
-        //                  "Suspected Serious Injury", "Fatal Injury"])
-        //         .range(["#6D9DC5", "#F2C9B2", "#F2B5D4", "#F4A300", "#D84B16"]);
+
 
         const dropdown = svg.append("foreignObject")
                     .attr("x", 10)
@@ -95,25 +92,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         
         spatialIndex.load(indexedFeatures);
-            
-        // function findZipCode(lat, lon, geoData) {
-        //     const point = [lon, lat];
-        //     for (const feature of geoData.features) {
-        //         const bounds = d3.geoBounds(feature);
-        //         const minX = bounds[0][0]; 
-        //         const minY = bounds[0][1]; 
-        //         const maxX = bounds[1][0];
-        //         const maxY = bounds[1][1];
-        //         // console.log([minX, minY, maxX, maxY]) 
-        //         if (lon >= minX && lon <= maxX && lat >= minY && lat <= maxY) {
-                    
-        //             if (d3.geoContains(feature, point)) {
-        //                 return feature.properties.ZIPCODE;
-        //             }
-        //         }
-        //     }
-        //     return null; 
-        // }
 
         function findZipCode(lat, lon) {
             const candidates = spatialIndex.search({
@@ -148,37 +126,6 @@ document.addEventListener('DOMContentLoaded', function () {
             .style("padding", "5px")
             .style("display","none");
         d3.csv("final.csv").then(function(data) {
-        // console.log(data);
-        // data.forEach(function(d) {
-        //     // console.log(d.injury_severity)
-        //     d.latitude = +d.latitude;
-        //     d.longitude = +d.longitude;
-        //     d.zipcode = findZipCode(d.latitude, d.longitude, dataset);
-        // });
-
-        // latitude="39.02738993";
-        // longitude="-76.98235396";
-        // zipcode = findZipCode(latitude, longitude);
-        // console.log(zipcode);
-        // data.forEach(d => {
-        //     d.latitude = +d.latitude;
-        //     d.longitude = +d.longitude;
-        //     const result = findZipCode(d.latitude, d.longitude);
-        //     if (result) {
-        //         const { zipcode, postal } = result;
-        //         d.zipCode = zipcode;
-        //         d.postal = postal;
-        //     } else {
-        //         d.zipCode = null;
-        //         d.postal = null;
-        //     }
-        // });
-
-        // const zipSeverityCounts = d3.rollups(
-        //     data,
-        //     v => d3.rollup(v, group => group.length, d => d.injury_severity),
-        //     d => d.zipcode
-        // );
 
         const zipSeverityCounts = d3.rollups(
             data,

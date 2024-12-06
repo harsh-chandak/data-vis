@@ -147,75 +147,60 @@
     <script src="./splom.js"></script>
     <script src="./stacked_bar_chart.js"></script>
     <script>
-        let lastScrollTop = 0;
-        
-        function isInViewport(element) {
-            const rect = element.getBoundingClientRect();
-            return rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && rect.right <= (window.innerWidth || document.documentElement.clientWidth);
-        }
-        
-        function handleScroll() {
-            const textContainers = document.querySelectorAll('.text-container');
-            const introcontainer = document.querySelectorAll('introduction');
-            let currentScrollTop = window.scrollY || window.pageYOffset;
-        
-            if (currentScrollTop > lastScrollTop) {
-                textContainers.forEach(container => {
-                    if (isInViewport(container)) {
-                        container.classList.add('visible');
-                    } else {
-                        container.classList.remove('visible');
-                    }
-                });
-            } else {
-                textContainers.forEach(container => {
-                    if (isInViewport(container)) {
-                        container.classList.add('visible');
-                    } else {
-                        container.classList.remove('visible');
-                    }
-                });
+    function isInViewport(element) {
+        const rect = element.getBoundingClientRect();
+        return (
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+        );
+    }
+
+    function handleScroll() {
+        const textContainers = document.querySelectorAll('.text-container');
+        textContainers.forEach(container => {
+            if (isInViewport(container)) {
+                container.classList.add('visible'); // Add the class once when in viewport
             }
-        
-            lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
-        }
-
-        function initializeTooltips() {
-            const infoIcons = document.querySelectorAll(".info-icon");
-
-            infoIcons.forEach(icon => {
-                
-                const tooltip = document.createElement("div");
-                tooltip.classList.add("custom-tooltip");
-                tooltip.innerText = icon.getAttribute("title"); 
-                icon.setAttribute("title", ""); 
-                document.body.appendChild(tooltip);
-
-                icon.addEventListener("mouseover", (event) => {
-                    tooltip.innerText = icon.dataset.tooltip || tooltip.innerText; 
-                    tooltip.style.display = "block";
-                    tooltip.style.left = event.pageX + 10 + "px"; 
-                    tooltip.style.top = event.pageY + 10 + "px";
-                });
-
-                
-                icon.addEventListener("mouseout", () => {
-                    tooltip.style.display = "none";
-                });
-
-                icon.addEventListener("mousemove", (event) => {
-                    tooltip.style.left = event.pageX + 10 + "px";
-                    tooltip.style.top = event.pageY + 10 + "px";
-                });
-            });
-            }
-        
-        window.addEventListener('scroll', handleScroll);
-        document.addEventListener('DOMContentLoaded', () => {
-            handleScroll(); 
-            initializeTooltips();
         });
+    }
+
+    function initializeTooltips() {
+        const infoIcons = document.querySelectorAll(".info-icon");
+
+        infoIcons.forEach(icon => {
+            const tooltip = document.createElement("div");
+            tooltip.classList.add("custom-tooltip");
+            tooltip.innerText = icon.getAttribute("title");
+            icon.setAttribute("title", "");
+            document.body.appendChild(tooltip);
+
+            icon.addEventListener("mouseover", (event) => {
+                tooltip.innerText = icon.dataset.tooltip || tooltip.innerText;
+                tooltip.style.display = "block";
+                tooltip.style.left = event.pageX + 10 + "px";
+                tooltip.style.top = event.pageY + 10 + "px";
+            });
+
+            icon.addEventListener("mouseout", () => {
+                tooltip.style.display = "none";
+            });
+
+            icon.addEventListener("mousemove", (event) => {
+                tooltip.style.left = event.pageX + 10 + "px";
+                tooltip.style.top = event.pageY + 10 + "px";
+            });
+        });
+    }
+
+    window.addEventListener('scroll', handleScroll);
+    document.addEventListener('DOMContentLoaded', () => {
+        handleScroll(); 
+        initializeTooltips();
+    });
     </script>
+    
     <footer>
         <h3>Interactivity and User-Centric Design</h3>
         <p>
