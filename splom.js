@@ -306,7 +306,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
                     const enlargedArc = d3.arc()
                         .innerRadius(0)
-                        .outerRadius(Math.min(overlayWidth, overlayHeight) / 2 - 20);
+                        .outerRadius(Math.min(overlayWidth, overlayHeight) / 2 - 50);
     
                     const total = pie.reduce((sum, p) => sum + p.data.count, 0);
     
@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         .enter().append("text")
                         .attr("transform", d => {
                             const [x, y] = enlargedArc.centroid(d);
-                            const scaleFactor = 0.5;
+                            const scaleFactor = 1.5;
                             return `translate(${x * scaleFactor + centerX}, ${y * scaleFactor + centerY})`;
                         })
                         .attr("text-anchor", "middle")
