@@ -1,29 +1,24 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const svgWidth = 1200, svgHeight = 600;
+    const svgWidth = 1200, svgHeight = 600
     const svg = d3.select("#splom-svg")
         .attr("width", svgWidth)
-        .attr("height", svgHeight);
+        .attr("height", svgHeight)
 
     d3.csv("final.csv", (row) => ({
         injury_severity: row.injury_severity,
         vehicle_year: row.vehicle_year,
         vehicle_make: row.vehicle_make
     })).then(rawData => {
-        let makeCount = {};
-
+        let makeCount = {}
         rawData.forEach(row => {
             let make = row.vehicle_make;
-            makeCount[make] = (makeCount[make] || 0) + 1; // Increment count for each vehicle_make
-        });
-
-        // Step 2: Filter makes that have a count greater than 20
+            makeCount[make] = (makeCount[make] || 0) + 1
+        })
         let filteredMakes = Object.keys(makeCount).filter(make => makeCount[make] > 10);
 
-        // Step 3: Output the filtered makes
-        // console.log(filteredMakes);
-        const data = processData(rawData);
-        createPieChartMatrix(data);
-    });
+        const data = processData(rawData)
+        createPieChartMatrix(data)
+    })
 
     function processData(rawData) {
         const car_country = {
@@ -38,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "JEEP": "American",
             "BUICK": "American",
             "KIA": "Korean",
-            "LAND ROVER": "European", // British
+            "LAND ROVER": "European",
             "MAZDA": "Japanese",
             "DODGE": "American",
             "BMW": "German",
@@ -51,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "MITSUBISHI": "Japanese",
             "MERCEDES-BENZ": "German",
             "TESLA": "American",
-            "VOLVO": "European", // Swedish
+            "VOLVO": "European",
             "FREIGHTLINER": "American",
             "LINCOLN": "American",
             "INTERNATIONAL": "American",
@@ -59,13 +54,13 @@ document.addEventListener('DOMContentLoaded', function () {
             "NEW FLYER": "American",
             "NABI": "American",
             "FIAT": "European",
-            "MINI": "European", // British
+            "MINI": "European",
             "other": "other",
             "CADILLAC": "American",
             "CHRYSLER": "American",
             "GMC": "American",
             "INFINITI": "Japanese",
-            "JAGUAR": "European", // British
+            "JAGUAR": "European",
             "MERCURY": "American",
             "SUZUKI": "Japanese",
             "HARLEY DAVIDSON": "American",
@@ -75,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "ISUZU": "Japanese",
             "KENWORTH": "American",
             "KAWASAKI": "Japanese",
-            "SAAB": "European", // Swedish
+            "SAAB": "European",
             "NISS": "Japanese",
             "HOND": "Japanese",
             "FRHT": "American",
@@ -106,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "THMS": "American",
             "THOM": "American",
             "CHRY": "American",
-            "LANDROVER": "European", // British
+            "LANDROVER": "European",
             "CHEVORLET": "American",
             "TESL": "American",
             "SCION": "Japanese",
@@ -132,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "TOYOT": "Japanese",
             "MERCEDES BENZ": "German",
             "HYUND": "Korean",
-            "VOLV": "European", // Swedish
+            "VOLV": "European",
             "HYUNDIA": "Korean",
             "CHEVEROLET": "American",
             "TOY": "Japanese",
@@ -145,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "STERLING": "American",
             "ORIO": "other",
             "ORION": "other"
-        };
+        }
 
 
 
@@ -163,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let final_data = [];
         rawData.map(row => {
             if (car_country[String(row.vehicle_make).trim().toUpperCase()]) {
-                const country = car_country[String(row.vehicle_make).trim().toUpperCase()] || 'other';
+                const country = car_country[String(row.vehicle_make).trim().toUpperCase()] || 'other'
                 const year_group = years[row.vehicle_year] || 'other';
                 const injury = String(row.injury_severity).trim().toUpperCase()
                 const injury_severity = injury.toUpperCase().includes("NO APPARENT INJURY") ? "None" :
@@ -252,88 +247,85 @@ document.addEventListener('DOMContentLoaded', function () {
             country_group.forEach(country => {
                 const groupData = final_data.filter(d => d.make_year === year && d.car_country === country);
     
-                const injurySeverityCount = d3.rollup(groupData, v => v.length, d => d.injury_severity);
+                const injurySeverityCount = d3.rollup(groupData, v => v.length, d => d.injury_severity)
                 const pieData = Array.from(injurySeverityCount, ([injury, count]) => ({ injury, count }))
-                    .filter(d => d.count > 0); // Remove slices with count = 0
+                    .filter(d => d.count > 0)
     
-                const pie = d3.pie().value(d => d.count)(pieData); // Pie chart calculation with integer values
-                const arc = d3.arc().innerRadius(0).outerRadius(pieWidth / 2);
+                const pie = d3.pie().value(d => d.count)(pieData)
+                const arc = d3.arc().innerRadius(0).outerRadius(pieWidth / 2)
     
                 const pieGroup = svg.append("g")
     .attr("transform", `translate(${xScale(year) + xScale.bandwidth() / 6}, ${yScale(country) + yScale.bandwidth() / 2})`);
 
     
-                // Calculate if there's any serious accident with a percentage greater than 0
                 const seriousAccident = pieData.some(d => {
-                    const percentage = (d.count / d3.sum(pieData, d => d.count)) * 100;
-                    return d.injury === "Serious" && parseFloat(percentage.toFixed(2)) > 0;
-                });
+                    const percentage = (d.count / d3.sum(pieData, d => d.count)) * 100
+                    return d.injury === "Serious" && parseFloat(percentage.toFixed(2)) > 0
+                })
     
-                // Only add the red circle if there are serious accidents
                 if (seriousAccident) {
                     pieGroup.append("circle")
                         .attr("r", pieWidth / 2)
                         .attr("fill", "none")
                         .attr("stroke", "#800000")
-                        .attr("stroke-width", 12);
+                        .attr("stroke-width", 12)
                 }
     
-                // Draw pie slices with integer values
+                // Draw pie slices with numbers on it
                 const paths = pieGroup.selectAll("path")
                     .data(pie)
                     .enter().append("path")
                     .attr("d", arc)
-                    .attr("fill", d => colorMapping[d.data.injury])  // Use the mapping
+                    .attr("fill", d => colorMapping[d.data.injury])
                     .attr("stroke", "white")
-                    .attr("stroke-width", 1);
+                    .attr("stroke-width", 1)
     
-                // Hover interaction for highlighting
+                // Hover interaction
                 paths.on("mouseover", function (event, d) {
                     d3.select(this)
                         .attr("stroke", "yellow")
-                        .attr("stroke-width", 3);
+                        .attr("stroke-width", 3)
     
-                    const overlayPie = d3.select("#overlay-pie");
+                    const overlayPie = d3.select("#overlay-pie")
     
-                    overlayPie.selectAll("path").remove();
-                    overlayPie.selectAll("text").remove();
-                    d3.select("#overlay").selectAll(".overlay-text").remove();
+                    overlayPie.selectAll("path").remove()
+                    overlayPie.selectAll("text").remove()
+                    d3.select("#overlay").selectAll(".overlay-text").remove()
     
-                    const overlayWidth = +overlayPie.attr("width");
-                    const overlayHeight = +overlayPie.attr("height");
-                    const centerX = overlayWidth / 2;
-                    const centerY = overlayHeight / 2;
+                    const overlayWidth = +overlayPie.attr("width")
+                    const overlayHeight = +overlayPie.attr("height")
+                    const centerX = overlayWidth / 2
+                    const centerY = overlayHeight / 2
     
                     const enlargedArc = d3.arc()
                         .innerRadius(0)
-                        .outerRadius(Math.min(overlayWidth, overlayHeight) / 2 - 50);
+                        .outerRadius(Math.min(overlayWidth, overlayHeight) / 2 - 50)
     
-                    const total = pie.reduce((sum, p) => sum + p.data.count, 0);
+                    const total = pie.reduce((sum, p) => sum + p.data.count, 0)
     
                     overlayPie.selectAll("path")
                         .data(pie)
                         .enter().append("path")
                         .attr("d", enlargedArc)
-                        .attr("fill", d => colorMapping[d.data.injury])  // Use the mapping
+                        .attr("fill", d => colorMapping[d.data.injury])
                         .attr("stroke", "white")
                         .attr("stroke-width", 2)
-                        .attr("transform", `translate(${centerX}, ${centerY})`);
+                        .attr("transform", `translate(${centerX}, ${centerY})`)
     
                     overlayPie.selectAll("text")
                         .data(pie)
                         .enter().append("text")
                         .attr("transform", d => {
-                            const [x, y] = enlargedArc.centroid(d);
-                            const scaleFactor = 1.5;
-                            return `translate(${x * scaleFactor + centerX}, ${y * scaleFactor + centerY})`;
+                            const [x, y] = enlargedArc.centroid(d)
+                            const scaleFactor = 1.5
+                            return `translate(${x * scaleFactor + centerX}, ${y * scaleFactor + centerY})`
                         })
                         .attr("text-anchor", "middle")
                         .attr("fill", "black")
                         .attr("font-size", "16px")
                         .text(d => {
-                            const percentage = ((d.data.count / total) * 100).toFixed(0);
-                            // Only display text if the percentage is greater than 0
-                            return percentage > 0 ? `${percentage}%` : "";
+                            const percentage = ((d.data.count / total) * 100).toFixed(0)
+                            return percentage > 0 ? `${percentage}%` : ""
                         });
     
     
@@ -341,15 +333,15 @@ document.addEventListener('DOMContentLoaded', function () {
                         .append("div")
                         .attr("class", "overlay-text")
                         .style("position", "absolute")
-                        .style("top", `${overlayHeight + 10}px`) // Position below the SVG in the overlay
-                        .style("left", "10px") // Provide some left padding
+                        .style("top", `${overlayHeight + 10}px`)
+                        .style("left", "10px")
                         .style("color", "white")
                         .style("font-size", "16px")
                         .style("line-height", "1.5")
-                        .style("width", "360px") // Ensure text fits within the overlay width
-                        .style("text-align", "left"); // Align the text
+                        .style("width", "360px")
+                        .style("text-align", "left")
     
-                    // Add category text dynamically
+                    // Add category text
                     pie.forEach(p => {
                         const percentage = ((p.data.count / total) * 100).toFixed(2);
                         textContainer.append("div")
@@ -359,40 +351,39 @@ document.addEventListener('DOMContentLoaded', function () {
                     overlay
                         .style("display", "block")
                         .style("left", `${event.pageX + 10}px`)
-                        .style("top", `${event.pageY + 10}px`);
+                        .style("top", `${event.pageY + 10}px`)
                 }).on("mouseout", function () {
                     d3.select(this)
                         .attr("stroke", "white")
-                        .attr("stroke-width", 1);
+                        .attr("stroke-width", 1)
     
-                    overlay.style("display", "none");
-                });
-            });
-        });
+                    overlay.style("display", "none")
+                })
+            })
+        })
     
     
         // Draw legend
-        const legendData = [...new Set(final_data.map(d => d.injury_severity))];
+        const legendData = [...new Set(final_data.map(d => d.injury_severity))]
         const legend = svg.append("g")
-            .attr("transform", `translate(${svgWidth - margin.right - 90}, ${margin.top})`);
+            .attr("transform", `translate(${svgWidth - margin.right - 90}, ${margin.top})`)
     
-        // Add the label "Severity of accidents" above the legend
+        // Add the label "Severtiy of acidents" above the legend
         legend.append("text")
             .attr("x", 0)
-            .attr("y", -10)  // Position the label above the first legend item
+            .attr("y", -10)
             .attr("fill", "white")
             .attr("font-size", "12px")
             .attr("font-weight", "bold")
             .text("Severity");
     
-        // Add the legend rectangles and text
         legendData.forEach((severity, i) => {
             legend.append("rect")
                 .attr("x", 0)
                 .attr("y", i * 30)
                 .attr("width", 20)
                 .attr("height", 20)
-                .attr("fill", colorMapping[severity]);
+                .attr("fill", colorMapping[severity])
     
             legend.append("text")
                 .attr("x", 25)
@@ -400,10 +391,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .attr("fill", "white")
                 .attr("font-size", "12px")
                 .text(severity);
-        });
+        })
     }
-    
-
-
 
 });
