@@ -58,15 +58,37 @@ const minTWd = 20;
 const minTHt = 40;
 
 function delnan(light) {
+    
+    const normalizedLight = light.toUpperCase();
+    
+    
     const lightMap = {
-        "DARK - LIGHTED": "Dark - Lighted",
-        "DARK - NOT LIGHTED": "Dark - Not Lighted",
+        "DARK - LIGHTED": "DL",
+        "DARK - NOT LIGHTED": "DNL",
         "DAWN": "Dawn",
         "DUSK": "Dusk",
-        "DAYLIGHT": "Daylight",
-        "UNKNOWN": "Unknown Lighting"
+        "DAYLIGHT": "Day",
+        //all others
+        "UNKNOWN": "Other",
+        "OTHER": "Other",
+        "DARK LIGHTS ON": "Other",
+        "DARK LIGHTS OFF": "Other",
+        "DARK NO LIGHTS": "Other",
+        "UNKNOWN LIGHTING": "Other",
+        "N/A": "Other"
     };
-    return lightMap[light] || "Other";
+    return lightMap[normalizedLight] || "Other";
+}
+function getLongForm(shortForm) {
+    const reverseMap = {
+        "DL": "Dark - Lighted",
+        "DNL": "Dark - Not Lighted",
+        "Dawn": "Dawn",
+        "Dusk": "Dusk",
+        "Day": "Daylight",
+        "Other": "Other Lighting Conditions"
+    };
+    return reverseMap[shortForm] || shortForm;
 }
 
 // function showDetails(d, originalData, selectedYear) {
@@ -217,7 +239,7 @@ function createViz(data) {
     updateViz("2015", "2015");
 
 
-    function mosaicChart(svg, processedData, xOffset, selectedYear, originalData) {
+    function mosaicChart(svg, processedData, xOffset, selectedYear, originalData, showYLabel = true) {
         const totalAccidents = d3.sum(Object.values(processedData), d => d.total);
         const mosaicData = [];
         let yPosition = 0;
@@ -286,12 +308,12 @@ function createViz(data) {
                 tooltip.transition()
                     .duration(200)
                     .style("opacity", .9);
-                tooltip.html(`
-                    Light Condition: ${d.light}<br>
-                    Severity: ${d.severity}<br>
-                    Count: ${d.count}<br>
-                    Percentage: ${d.percentage}% of total accidents
-                `)
+                    tooltip.html(`
+                        Light Condition: ${getLongForm(d.light)}<br>
+                        Severity: ${d.severity}<br>
+                        Count: ${d.count}<br>
+                        Percentage: ${d.percentage}% of total accidents
+                    `)
                     .style("left", (event.pageX + 5) + "px")
                     .style("top", (event.pageY - 28) + "px");
             })
@@ -318,17 +340,22 @@ function createViz(data) {
             .style("fill", "white")
             .style("pointer-events", "none");
 
-        chartGroup.selectAll(".light-label")
-            .data(Object.keys(processedData))
+            chartGroup.selectAll(".light-label")
+            .data(Object.entries(processedData)
+                .sort((a, b) => b[1].total - a[1].total)
+                .map(([light]) => light))
             .enter()
             .append("text")
             .attr("class", "light-label")
             .attr("x", -10)
             .attr("y", (d, i) => {
                 const prevHeights = Object.entries(processedData)
+                    .sort((a, b) => b[1].total - a[1].total)
                     .slice(0, i)
-                    .reduce((sum, [_, data]) => sum + Math.max(minTHt, (data.total / totalAccidents) * height), 0);
-                return prevHeights + Math.max(minTHt, (processedData[d].total / totalAccidents) * height) / 2;
+                    .reduce((sum, [_, data]) => 
+                        sum + Math.max(minTHt, (data.total / totalAccidents) * height), 0);
+                return prevHeights + Math.max(minTHt, 
+                    (processedData[d].total / totalAccidents) * height) / 2;
             })
             .attr("text-anchor", "end")
             .text(d => d)
@@ -350,44 +377,74 @@ function createViz(data) {
 
         chartGroup.append("text")
             .attr("x", singleWidth / 2)
-            .attr("y", height + 120)
+            .attr("y", height + 100)
             .attr("text-anchor", "middle")
             .style("font-size", "14px")
             .style("fill", "white")
             .text("Injury Severity");
 
-        chartGroup.append("text")
-            .attr("transform", "rotate(-90)")
-            .attr("x", -height / 2)
-            .attr("y", -60)
-            .attr("text-anchor", "middle")
-            .style("font-size", "14px")
-            .style("fill", "white")
-            .text("Light Condition");
+            if (showYLabel) {
+                chartGroup.append("text")
+                    .attr("transform", "rotate(-90)")
+                    .attr("x", -height / 2)
+                    .attr("y", -60)
+                    .attr("text-anchor", "middle")
+                    .style("font-size", "14px")
+                    .style("fill", "white")
+                    .text("Light Condition");
+            }
     }
 
     function createLegend(svg, color) {
         const legendWidth = tWd - margin.left - margin.right;
-        const legend = svg.append("g")
-            .attr("transform", `translate(${margin.left}, ${height + margin.top + 150})`);
-
-        const legendItems = legend.selectAll("g")
+        
+        // Injury Severity Legend
+        const severityLegend = svg.append("g")
+            .attr("transform", `translate(${margin.left}, ${height + margin.top + 120})`);
+    
+        const legendItems = severityLegend.selectAll("g")
             .data(color.domain())
             .enter()
             .append("g")
             .attr("transform", (d, i) => `translate(${i * (legendWidth / color.domain().length)}, 0)`);
-
+    
         legendItems.append("rect")
             .attr("width", 18)
             .attr("height", 18)
             .attr("fill", d => color(d))
             .attr("stroke", "#000")
             .attr("stroke-width", 0.5);
-
+    
         legendItems.append("text")
             .attr("x", 25)
             .attr("y", 14)
             .text(d => d.toLowerCase())
+            .style("font-size", "12px")
+            .style("fill", "white");
+    
+        // Light Conditions Legend
+        const lightLegend = svg.append("g")
+            .attr("transform", `translate(${margin.left}, ${height + margin.top + 160})`);
+    
+        const lightItems = [
+            {short: "DL", long: "Dark - Lighted"},
+            {short: "DNL", long: "Dark - Not Lighted"},
+            {short: "Dawn", long: "Dawn"},
+            {short: "Dusk", long: "Dusk"},
+            {short: "Day", long: "Daylight"},
+            {short: "Other", long: "Other Lighting Conditions"}
+        ];
+    
+        const lightLegendItems = lightLegend.selectAll("g")
+            .data(lightItems)
+            .enter()
+            .append("g")
+            .attr("transform", (d, i) => `translate(${i * (legendWidth / lightItems.length)}, 0)`);
+    
+        lightLegendItems.append("text")
+            .attr("x", 0)
+            .attr("y", 14)
+            .text(d => `${d.short}: ${d.long}`)
             .style("font-size", "12px")
             .style("fill", "white");
     }
@@ -452,8 +509,8 @@ function createViz(data) {
                 updateViz(dropdown1.property("value"), this.value);
             });
 
-        mosaicChart(svg, processedData1, 0, selectedYear1, data);
-        mosaicChart(svg, processedData2, singleWidth + margin.left, selectedYear2, data);
+            mosaicChart(svg, processedData1, 0, selectedYear1, data, true);
+            mosaicChart(svg, processedData2, singleWidth + margin.left, selectedYear2, data, false);
 
         createLegend(svg, d3.scaleOrdinal()
             .domain([
