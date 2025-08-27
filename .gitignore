@@ -2,3 +2,4 @@ node_modules
 package-lock.json
 raw_data.csv
 moew.txt
+.specstory
