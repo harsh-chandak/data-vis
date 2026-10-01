@@ -8,6 +8,11 @@
 
 **[Live visualization](https://data-vis-0eqs.onrender.com/)**
 
+[![Play the fifteen-second tour: 32,429 crash records across five linked views, joined to ZIP boundaries from GeoJSON](assets/brag-poster.jpg)](https://github.com/harsh-chandak/data-vis/blob/main/assets/brag.mp4)
+
+<sub>▶ Fifteen seconds on what the five views answer together. GitHub strips
+`<video>` from READMEs, so the poster above links to the player.</sub>
+
 Montgomery County publishes every reported crash: where it happened, the weather,
 the light, the road surface, who was at fault and how badly people were hurt.
 That is 32,429 records across 20 fields, which is far too many to read and far
