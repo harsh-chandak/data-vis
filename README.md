@@ -6,6 +6,8 @@
 
 # Mapping Accident Trends and Patterns in Maryland
 
+**[Live visualization](https://data-vis-0eqs.onrender.com/)**
+
 Montgomery County publishes every reported crash: where it happened, the weather,
 the light, the road surface, who was at fault and how badly people were hurt.
 That is 32,429 records across 20 fields, which is far too many to read and far
@@ -25,7 +27,7 @@ that is a question you answer by moving between views, not by reading one.
 | **Pie chart matrix** | How crash outcomes differ between vehicle makes |
 | **Mosaic chart** | Injury severity against light conditions, sized by how common each combination is |
 | **Stacked bar matrix** | Weather and light conditions against crash counts, side by side |
-| **Car in a clock** | A radial chart putting time of day against severity, laid out on a car silhouette |
+| **Car in a clock** | Where the vehicle was struck, as the 12 positions on a clock face laid over a car, against how badly people were hurt |
 
 Selections propagate across all five. The shared filter state lives in the page,
 so no view owns the current selection and any of them can set it.
