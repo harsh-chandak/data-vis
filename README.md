@@ -35,12 +35,15 @@ so no view owns the current selection and any of them can set it.
 [Crash Reporting — Drivers Data](https://catalog.data.gov/dataset/crash-reporting-drivers-data),
 Montgomery County, via data.gov.
 
-The raw export is not usable as published: inconsistent casing in the categorical
-columns, rows without coordinates, and no ZIP code on the records at all. The
-cleaning pass normalizes the categories, drops rows that cannot be placed on a
-map, and assigns each remaining crash a ZIP by point-in-polygon against
-`Zip_Code.geojson` using Turf. The result is `final.csv`, which is what the page
-loads.
+The raw export is not usable as published, for two reasons. Records carry `NA`
+in any of the fields the views depend on, and there is no ZIP code on a record at
+all — only a latitude and longitude.
+
+So the cleaning pass keeps only rows where all 17 fields it needs are present and
+not `NA`, then gives each surviving crash a ZIP by testing its coordinate against
+every polygon in `Zip_Code.geojson` with Turf's `booleanPointInPolygon`. That
+join is what makes the map's boundaries usable as a filter rather than decoration.
+The result is `final.csv`, which is what the page loads.
 
 ## Running it
 
