@@ -8,17 +8,18 @@
 
 **[Live visualization](https://data-vis-0eqs.onrender.com/)**
 
-[![Play the fifteen-second tour: 32,429 crash records across five linked views, joined to ZIP boundaries from GeoJSON](assets/brag-poster.jpg)](https://github.com/harsh-chandak/data-vis/blob/main/assets/brag.mp4)
+[![Fifteen seconds: 32,429 crash records across six linked views, joined to ZIP boundaries from GeoJSON](assets/brag.gif)](https://github.com/harsh-chandak/data-vis/blob/main/assets/brag.mp4)
 
-<sub>▶ Fifteen seconds on what the five views answer together. GitHub strips
-`<video>` from READMEs, so the poster above links to the player.</sub>
+<sub>Plays above. GitHub strips `<video>` from READMEs, so this is the silent
+loop; [the full video](https://github.com/harsh-chandak/data-vis/blob/main/assets/brag.mp4)
+has sound.</sub>
 
 Montgomery County publishes every reported crash: where it happened, the weather,
 the light, the road surface, who was at fault and how badly people were hurt.
 That is 32,429 records across 20 fields, which is far too many to read and far
 too few dimensions to hold in your head at once.
 
-This is that dataset as five views that are wired together. Brush a region of the
+This is that dataset as six views that are wired together. Brush a region of the
 map and every chart redraws for those crashes only. Pick a severity band in the
 mosaic and the map keeps just those points. The question the project is built
 around is not "how many crashes" but "which conditions travel together" — and
@@ -32,9 +33,10 @@ that is a question you answer by moving between views, not by reading one.
 | **Pie chart matrix** | How crash outcomes differ between vehicle makes |
 | **Mosaic chart** | Injury severity against light conditions, sized by how common each combination is |
 | **Stacked bar matrix** | Weather and light conditions against crash counts, side by side |
+| **Treemap** | The same severity breakdown by area, so a category too thin to see in the mosaic is still readable |
 | **Car in a clock** | Where the vehicle was struck, as the 12 positions on a clock face laid over a car, against how badly people were hurt |
 
-Selections propagate across all five. The shared filter state lives in the page,
+Selections propagate across all six. The shared filter state lives in the page,
 so no view owns the current selection and any of them can set it.
 
 ## Data
