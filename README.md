@@ -1,7 +1,7 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/card-dark.png">
   <source media="(prefers-color-scheme: light)" srcset="assets/card-light.png">
-  <img src="assets/card-light.png" alt="Maryland Crash Atlas. Linked D3 views over public crash reports, where selecting in any chart filters the map with it. 32 thousand crash records, five linked view types, ZIP code boundaries from GeoJSON. Built with D3.js, Node.js, GeoJSON and data.gov.">
+  <img src="assets/card-light.png" alt="Maryland Crash Atlas. Linked D3 views over public crash reports, where selecting in any chart filters the map with it. 32 thousand crash records mapped, six linked views, ZIP code boundaries from GeoJSON. Built with D3.js, Node.js, GeoJSON and data.gov.">
 </picture>
 
 # Mapping Accident Trends and Patterns in Maryland
